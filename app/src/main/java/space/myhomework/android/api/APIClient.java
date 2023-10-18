@@ -89,9 +89,18 @@ public class APIClient {
             e.printStackTrace();
         }
 
-        makeRequest(Request.Method.GET, "auth/csrf", new HashMap<String, String>(), null, new Response.ErrorListener() {
+        makeRequest(Request.Method.GET, "auth/csrf", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                _csrfToken = getCookieValue("csrfToken");
+                if (initCallback != null) {
+                    initCallback.run();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                // TODO: probably should actually crash here
                 _csrfToken = getCookieValue("csrfToken");
                 if (initCallback != null) {
                     initCallback.run();

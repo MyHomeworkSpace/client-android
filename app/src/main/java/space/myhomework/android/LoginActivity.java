@@ -45,14 +45,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        EditText username = (EditText)findViewById(R.id.username);
+        EditText email = (EditText)findViewById(R.id.email);
         EditText password = (EditText)findViewById(R.id.password);
-        final String usernameStr = username.getText().toString();
+        final String emailStr = email.getText().toString();
         final String passwordStr = password.getText().toString();
 
         boolean error = false;
-        if (usernameStr.isEmpty()) {
-            username.setError("Username is required.");
+        if (emailStr.isEmpty()) {
+            email.setError("Email is required.");
             error = true;
         }
         if (passwordStr.isEmpty()) {
@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void run() {
                 HashMap<String, String> params = new HashMap<String, String>();
-                params.put("username", usernameStr);
+                params.put("email", emailStr);
                 params.put("password", passwordStr);
                 APIClient.getInstance(ctx, null).makeRequest(Request.Method.POST, "auth/login", params, new Response.Listener<JSONObject>() {
                     @Override
@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                         if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                            builder.setTitle("Error").setMessage("The username or password was incorrect.");
+                            builder.setTitle("Error").setMessage("The email or password was incorrect.");
                         } else {
                             builder.setTitle("Unable to connect").setMessage("Could not connect to the MyHomeworkSpace servers.");
                         }

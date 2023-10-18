@@ -111,15 +111,12 @@ public class MainActivity extends AppCompatActivity
 
                             c.account.ID = response.getInt("id");
                             c.account.Name = response.getString("name");
-                            c.account.Username = response.getString("username");
                             c.account.Email = response.getString("email");
-                            c.account.Type = response.getString("type");
-                            c.account.Features = response.getString("features");
 
                             View navHeaderMain = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
                             ((TextView)navHeaderMain.findViewById(R.id.navName)).setText(c.account.Name);
-                            ((TextView)navHeaderMain.findViewById(R.id.navUsername)).setText(c.account.Username);
+                            ((TextView)navHeaderMain.findViewById(R.id.navUsername)).setText(c.account.Email);
 
                             APIClient.getInstance(ctx, null).makeRequest(Request.Method.GET, "classes/get", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
                                 @Override

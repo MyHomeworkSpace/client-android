@@ -13,17 +13,17 @@
         android:id="@+id/loginText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Log in with your Dalton account to access MyHomeworkSpace." />
+        android:text="Log in with your MyHomeworkSpace account." />
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:nextFocusForward="@+id/password"
         android:imeOptions="actionNext"
-        android:inputType="text"
-        android:hint="Username"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
         android:layout_below="@+id/loginText">
         <requestFocus />
     </EditText>
@@ -36,7 +36,7 @@
         android:imeOptions="actionDone"
         android:hint="Password"
         android:inputType="textPassword"
-        android:layout_below="@+id/username" />
+        android:layout_below="@+id/email" />
 
     <Button
         android:id="@+id/login"
