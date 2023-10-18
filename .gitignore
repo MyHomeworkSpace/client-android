@@ -1,25 +1,36 @@
-.DS_Store
+# Gradle files
+.gradle/
+build/
 
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
+
+# IntelliJ
 *.iml
-.gradle
-/local.properties
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-# Android Studio 3 in .gitignore file.
-.idea/caches
-.idea/modules.xml
-# Comment next line if keeping position of elements in Navigation Editor is relevant for you
-.idea/navEditor.xml
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
 
-/build
-/captures
+# Keystore files
+*.jks
+*.keystore
 
-.externalNativeBuild
-.cxx
+# Google Services (e.g. APIs or Firebase)
+google-services.json
 
-app-release.apk
-app/release
+# Android Profiling
+*.hprof
+
+# other stuff
+.DS_Store
