@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -16,10 +18,12 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONObject;
 
@@ -81,6 +85,14 @@ public class EditHomeworkActivity extends AppCompatActivity {
             ((CheckBox)findViewById(R.id.homeworkDone)).setChecked(hw.Complete);
             ((EditText)findViewById(R.id.homeworkDesc)).setText(hw.Description);
         }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                save();
+            }
+        });
     }
 
     public void setDate(Date d) {
@@ -114,22 +126,6 @@ public class EditHomeworkActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 return onBack();
-            case R.id.action_discard_changes:
-                new AlertDialog.Builder(this)
-                    .setTitle("Leave without saving?")
-                    .setMessage("Are you sure you want to discard your changes?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            setResult(0);
-                            finish();
-                        }
-
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-                return true;
             case R.id.action_delete:
                 final Context ctx = this;
                 new AlertDialog.Builder(this)
@@ -191,6 +187,22 @@ public class EditHomeworkActivity extends AppCompatActivity {
     }
 
     public boolean onBack() {
+        new AlertDialog.Builder(this)
+            .setTitle("Leave without saving?")
+            .setMessage("Are you sure you want to discard your changes?")
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    setResult(0);
+                    finish();
+                }
+            })
+            .setNegativeButton("No", null)
+            .show();
+        return false;
+    }
+
+    public void save() {
         EditText homeworkName = (EditText) findViewById(R.id.homeworkName);
         TextView homeworkDue = (TextView) findViewById(R.id.homeworkDueText);
         EditText homeworkDesc = (EditText) findViewById(R.id.homeworkDesc);
@@ -221,11 +233,11 @@ public class EditHomeworkActivity extends AppCompatActivity {
             });
             AlertDialog dialog = builder.create();
             dialog.show();
-            return true;
+            return;
         }
 
         if (error) {
-            return true;
+            return;
         }
 
         int classId = -1;
@@ -282,7 +294,5 @@ public class EditHomeworkActivity extends AppCompatActivity {
                 });
             }
         });
-
-        return false;
     }
 }

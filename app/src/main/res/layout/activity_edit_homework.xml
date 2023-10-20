@@ -1,64 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".EditHomeworkActivity">
 
-    <EditText
-        android:id="@+id/homeworkName"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:imeOptions="actionNext"
-        android:inputType="text"
-        android:hint="Name">
-        <requestFocus />
-    </EditText>
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/homeworkDueText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Due date not set"
-        android:textSize="18dp"
-        android:layout_marginLeft="3dp"
-        android:layout_below="@+id/homeworkName"/>
+        <EditText
+            android:id="@+id/homeworkName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:hint="Name">
+            <requestFocus />
+        </EditText>
 
-    <Button
-        android:id="@+id/homeworkDueButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Change"
-        android:onClick="openDueDateDialog"
-        android:layout_below="@+id/homeworkDueText"/>
+        <TextView
+            android:id="@+id/homeworkDueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Due date not set"
+            android:textSize="18dp"
+            android:layout_marginLeft="3dp"
+            android:layout_below="@+id/homeworkName"/>
 
-    <Spinner
-        android:id="@+id/homeworkClass"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/homeworkDueButton"
-        android:spinnerMode="dropdown"
-        android:hint="Class" />
+        <Button
+            android:id="@+id/homeworkDueButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change"
+            android:onClick="openDueDateDialog"
+            android:layout_below="@+id/homeworkDueText"/>
 
-    <CheckBox
-        android:id="@+id/homeworkDone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/homeworkClass"
-        android:text="Done?"/>
+        <Spinner
+            android:id="@+id/homeworkClass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/homeworkDueButton"
+            android:spinnerMode="dropdown"
+            android:hint="Class" />
 
-    <EditText
-        android:id="@+id/homeworkDesc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/homeworkDone"
-        android:inputType="textMultiLine"
-        android:minLines="2"
-        android:hint="Description" />
+        <CheckBox
+            android:id="@+id/homeworkDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/homeworkClass"
+            android:text="Done?"/>
 
-</RelativeLayout>
+        <EditText
+            android:id="@+id/homeworkDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/homeworkDone"
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:hint="Description" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="Save"
+        android:src="@drawable/ic_save" />
+</FrameLayout>
