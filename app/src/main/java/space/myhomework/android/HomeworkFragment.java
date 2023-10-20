@@ -55,15 +55,6 @@ public class HomeworkFragment extends Fragment {
         }
     }
 
-    public String findClassName(ArrayList<APIClass> classes, int id) {
-        for (APIClass classObj : classes) {
-            if (classObj.ID == id) {
-                return classObj.Name;
-            }
-        }
-        return "Error";
-    }
-
     public void loadHomework(final View v) {
         final Activity activity = this.getActivity();
         final ArrayList<APIClass> classes = APIClient.getInstance(getContext(), null).classes;
