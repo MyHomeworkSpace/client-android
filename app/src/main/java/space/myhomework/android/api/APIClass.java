@@ -3,24 +3,24 @@ package space.myhomework.android.api;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class APIClass implements Parcelable {
     public int ID;
     public String Name;
     public String Teacher;
 
-    public APIClass() {
-
-    }
-
-    public APIClass(String name, String teacher) {
-        Name = name;
-        Teacher = teacher;
-    }
-
     public APIClass(Parcel in) {
         ID = in.readInt();
         Name = in.readString();
         Teacher = in.readString();
+    }
+
+    public APIClass(JSONObject o) throws JSONException {
+        ID = o.getInt("id");
+        Name = o.getString("name");
+        Teacher = o.getString("teacher");
     }
 
     @Override

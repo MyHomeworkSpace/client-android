@@ -95,17 +95,7 @@ public class HomeworkFragment extends Fragment {
 
                     for (int i = 0; i < homework.length(); i++) {
                         JSONObject homeworkItem = homework.getJSONObject(i);
-                        APIHomework homeworkObj = new APIHomework();
-
-                        homeworkObj.ID = homeworkItem.getInt("id");
-                        homeworkObj.Name = homeworkItem.getString("name");
-                        homeworkObj.Due = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(homeworkItem.getString("due"));
-                        homeworkObj.Description = homeworkItem.getString("desc");
-                        homeworkObj.Complete = (homeworkItem.getInt("complete") == 1);
-                        homeworkObj.ClassID = homeworkItem.getInt("classId");
-                        homeworkObj.UserID = homeworkItem.getInt("userId");
-
-                        homeworkObj.Class = findClassName(classes, homeworkObj.ClassID);
+                        APIHomework homeworkObj = new APIHomework(homeworkItem, classes);
 
                         // WHY DOES THIS CRAPPY LANGUAGE HAVE NO GOOD BUILTIN DATE API
                         long distanceToDue = (homeworkObj.Due.getTime() - new Date().getTime());

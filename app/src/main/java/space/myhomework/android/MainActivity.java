@@ -107,11 +107,7 @@ public class MainActivity extends AppCompatActivity
                     public void onResponse(JSONObject response) {
                         try {
                             APIClient c = APIClient.getInstance(ctx, null);
-                            c.account = new APIAccount();
-
-                            c.account.ID = response.getInt("id");
-                            c.account.Name = response.getString("name");
-                            c.account.Email = response.getString("email");
+                            c.account = new APIAccount(response.getJSONObject("user"));
 
                             View navHeaderMain = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
@@ -128,12 +124,7 @@ public class MainActivity extends AppCompatActivity
 
                                         for (int i = 0; i < classesObj.length(); i++) {
                                             JSONObject classObj = classesObj.getJSONObject(i);
-                                            APIClass apiClass = new APIClass();
-
-                                            apiClass.ID = classObj.getInt("id");
-                                            apiClass.Name = classObj.getString("name");
-                                            apiClass.Teacher = classObj.getString("teacher");
-
+                                            APIClass apiClass = new APIClass(classObj);
                                             c.classes.add(apiClass);
                                         }
 
