@@ -7,25 +7,11 @@
     android:orientation="vertical"
     tools:context="space.myhomework.android.MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorContainer"
-        android:fitsSystemWindows="true">
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/AppTheme.Toolbar" />
-    </com.google.android.material.appbar.AppBarLayout>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/content_main"
-        android:layout_below="@+id/app_bar_layout"
+
         android:layout_above="@+id/bottom_navigation"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
