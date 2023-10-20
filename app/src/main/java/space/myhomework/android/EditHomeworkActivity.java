@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -18,21 +17,24 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import space.myhomework.android.api.APIClass;
 import space.myhomework.android.api.APIClient;
@@ -105,11 +107,25 @@ public class EditHomeworkActivity extends AppCompatActivity {
         if (dialogDate == null) {
             dialogDate = new Date();
         }
-        DatePickerFragment frag = new DatePickerFragment();
-        Bundle args = new Bundle();
-        args.putString("date", DateFormat.getDateInstance().format(dialogDate));
-        frag.setArguments(args);
-        frag.show(getSupportFragmentManager(), "datePicker");
+
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder
+            .datePicker()
+            .setSelection(dialogDate.getTime())
+            .build();
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                calendar.setTimeInMillis(selection);
+
+                Calendar localCalendar = GregorianCalendar.getInstance();
+                localCalendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+                setDate(localCalendar.getTime());
+                ((TextView) findViewById(R.id.homeworkDueText)).setError(null);
+            }
+        });
+        picker.show(getSupportFragmentManager(), "datePicker");
     }
 
     @Override
