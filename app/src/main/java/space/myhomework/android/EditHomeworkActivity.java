@@ -196,13 +196,63 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return onBack();
+        if (keyCode == KeyEvent.KEYCODE_BACK && onBack()) {
+            return true;
         }
+
         return super.onKeyDown(keyCode, event);
     }
 
+    public boolean hasChangeBeenMade() {
+        EditText homeworkName = (EditText) findViewById(R.id.homeworkName);
+        EditText homeworkDesc = (EditText) findViewById(R.id.homeworkDesc);
+        Spinner homeworkClass = (Spinner) findViewById(R.id.homeworkClass);
+        CheckBox homeworkDone = (CheckBox) findViewById(R.id.homeworkDone);
+
+        String homeworkDueString = dueDate != null ? new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(dueDate) : "";
+
+        String initialHomeworkName = hw != null ? hw.Name : "";
+        String initialHomeworkDue = hw != null ? new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(hw.Due) : "";
+        String initialHomeworkDesc = hw != null ? hw.Description : "";
+        int initialHomeworkClassID = hw != null ? hw.ClassID : -1;
+        boolean initialHomeworkComplete = hw != null ? hw.Complete : false;
+
+        if (!homeworkName.getText().toString().equals(initialHomeworkName)) {
+            return true;
+        }
+
+        if (!homeworkDueString.equals(initialHomeworkDue)) {
+            return true;
+        }
+
+        if (!homeworkDesc.getText().toString().equals(initialHomeworkDesc)) {
+            return true;
+        }
+
+        int classID = -1;
+        for (APIClass classObj : classes) {
+            if (classObj.Name.equals(homeworkClass.getSelectedItem())) {
+                classID = classObj.ID;
+                break;
+            }
+        }
+
+        if (classID != initialHomeworkClassID) {
+            return true;
+        }
+
+        if (homeworkDone.isChecked() != initialHomeworkComplete) {
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean onBack() {
+        if (!hasChangeBeenMade()) {
+            return false;
+        }
+
         new AlertDialog.Builder(this)
             .setTitle("Leave without saving?")
             .setMessage("Are you sure you want to discard your changes?")
@@ -215,7 +265,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
             })
             .setNegativeButton("No", null)
             .show();
-        return false;
+        return true;
     }
 
     public void save() {
