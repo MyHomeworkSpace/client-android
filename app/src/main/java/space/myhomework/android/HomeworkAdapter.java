@@ -34,14 +34,16 @@ public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
 
         View item = convertView.findViewById(R.id.homeworkItem);
 
-        TextView name = (TextView) convertView.findViewById(R.id.homeworkName);
-        TextView subtext = (TextView) convertView.findViewById(R.id.homeworkSubtext);
+        TextView nameView = convertView.findViewById(R.id.homeworkName);
+        TextView dueView = convertView.findViewById(R.id.homeworkDue);
+        TextView classView = convertView.findViewById(R.id.homeworkClass);
 
         long distanceToDue = (hw.Due.getTime() - new Date().getTime());
         boolean overdue = false;
         if (distanceToDue < 0) { // overdue
             overdue = true;
-            subtext.setTextColor(Color.RED);
+            dueView.setTextColor(Color.RED);
+            classView.setTextColor(Color.RED);
         }
 
         String hwNameStr = hw.Name;
@@ -60,15 +62,19 @@ public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
             nameSpannable.setSpan(new ForegroundColorSpan(Color.RED), hwNameStr.split(" ")[0].length(), hwNameStr.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
         }
 
-        name.setText(nameSpannable);
-        subtext.setText("due " + hw.Due.toString().split(" 00:")[0] + " in " + hw.Class.Name);
+        nameView.setText(nameSpannable);
+        dueView.setText("due " + hw.Due.toString().split(" 00:")[0]);
+        classView.setText("in " + hw.Class.Name);
 
         if (hw.Complete) {
-            name.setTypeface(null, Typeface.ITALIC);
-            name.setPaintFlags(name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            nameView.setTypeface(null, Typeface.ITALIC);
+            nameView.setPaintFlags(nameView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-            subtext.setTypeface(null, Typeface.ITALIC);
-            subtext.setPaintFlags(subtext.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            dueView.setTypeface(null, Typeface.ITALIC);
+            dueView.setPaintFlags(dueView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+            classView.setTypeface(null, Typeface.ITALIC);
+            classView.setPaintFlags(classView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
             item.setBackgroundColor(Color.LTGRAY);
         }
