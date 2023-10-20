@@ -61,7 +61,7 @@ public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
         }
 
         name.setText(nameSpannable);
-        subtext.setText("due " + hw.Due.toString().split(" 00:")[0] + " in " + hw.Class);
+        subtext.setText("due " + hw.Due.toString().split(" 00:")[0] + " in " + hw.Class.Name);
 
         if (hw.Complete) {
             name.setTypeface(null, Typeface.ITALIC);

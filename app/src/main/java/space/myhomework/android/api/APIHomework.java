@@ -19,7 +19,7 @@ public class APIHomework implements Parcelable {
     public Date Due;
     public String Description;
     public boolean Complete;
-    public String Class;
+    public APIClass Class;
     public int ClassID;
     public int UserID;
 
@@ -34,7 +34,7 @@ public class APIHomework implements Parcelable {
         }
         Description = in.readString();
         Complete = (in.readByte() != 0);
-        Class = in.readString();
+        Class = new APIClass(in);
         ClassID = in.readInt();
         UserID = in.readInt();
     }
@@ -48,16 +48,17 @@ public class APIHomework implements Parcelable {
         ClassID = o.getInt("classId");
         UserID = o.getInt("userId");
 
-        Class = findClassName(classes, ClassID);
+        Class = findClass(classes, ClassID);
     }
 
-    private static String findClassName(ArrayList<APIClass> classes, int id) {
+    private static APIClass findClass(ArrayList<APIClass> classes, int id) {
         for (APIClass classObj : classes) {
             if (classObj.ID == id) {
-                return classObj.Name;
+                return classObj;
             }
         }
-        return "Error";
+
+        return null;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class APIHomework implements Parcelable {
         parcel.writeString(DateFormat.getDateInstance().format(Due));
         parcel.writeString(Description);
         parcel.writeByte(Complete ? (byte)1 : (byte)0);
-        parcel.writeString(Class);
+        Class.writeToParcel(parcel, i);
         parcel.writeInt(ClassID);
         parcel.writeInt(UserID);
     }

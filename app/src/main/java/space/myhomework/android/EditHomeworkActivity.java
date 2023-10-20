@@ -64,10 +64,14 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
         classes = params.getParcelableArrayList("classes");
         Spinner classSpinner = (Spinner)findViewById(R.id.homeworkClass);
+
+        ArrayList<Integer> classIDs = new ArrayList<Integer>();
         ArrayList<String> classStrings = new ArrayList<String>();
 
+        classIDs.add(-1);
         classStrings.add("No class");
         for (APIClass apiClass : classes) {
+            classIDs.add(apiClass.ID);
             classStrings.add(apiClass.Name);
         }
 
@@ -79,7 +83,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
             ((EditText)findViewById(R.id.homeworkName)).setText(hw.Name);
             setDate(hw.Due);
             for (int i = 0; i < classSpinner.getCount(); i++) {
-                if (classSpinner.getItemAtPosition(i).equals(hw.Class)) {
+                if (classIDs.get(i).equals(hw.Class.ID)) {
                     classSpinner.setSelection(i);
                     break;
                 }
