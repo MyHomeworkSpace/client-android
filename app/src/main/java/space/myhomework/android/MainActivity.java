@@ -165,9 +165,7 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
         } else if (id == R.id.nav_classes) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new ClassesFragment()).commit();
-        //} else if (id == R.id.nav_planner) {
-
-        } else
+        }
 
         setTitle(item.getTitle());
 
