@@ -134,7 +134,25 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
+        getMenuInflater().inflate(R.menu.activity_main_drawer, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.nav_log_out) {
+            APIClient.clearInstance();
+            File file = new File(this.getFilesDir(), "session_id");
+            file.delete();
+            setResult(1);
+            finish();
+        }
+
+        return true;
     }
 
     @Override
@@ -149,19 +167,9 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.content_frame, new ClassesFragment()).commit();
         //} else if (id == R.id.nav_planner) {
 
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-        } else if (id == R.id.nav_log_out) {
-            APIClient.clearInstance();
-            File file = new File(this.getFilesDir(), "session_id");
-            file.delete();
-            setResult(1);
-            finish();
-        }
+        } else
 
-        if (id != R.id.nav_settings) {
-            setTitle(item.getTitle());
-        }
+        setTitle(item.getTitle());
 
         return true;
     }
