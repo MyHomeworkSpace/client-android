@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import space.myhomework.android.api.APIClass;
+import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIHomework;
 
 public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
@@ -52,7 +53,8 @@ public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
             hwNameStr = hwNameStr + " (late)";
         }
 
-        PrefixInfo prefixInfo = PrefixManager.getPrefixInfo(hwNameStr);
+        APIClient c = APIClient.getInstance(getContext(), null);
+        PrefixInfo prefixInfo = c.prefixes.getPrefixInfo(hwNameStr);
         Spannable nameSpannable = new SpannableString(hwNameStr);
 
         nameSpannable.setSpan(new BackgroundColorSpan(prefixInfo.BackgroundColor), 0, hwNameStr.split(" ")[0].length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);

@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import space.myhomework.android.PrefixManager;
+
 public class APIClient {
     private final String baseURL = "https://api-v2.myhomework.space/";
 
@@ -55,6 +57,7 @@ public class APIClient {
 
     public APIAccount account;
     public ArrayList<APIClass> classes;
+    public PrefixManager prefixes = new PrefixManager();
 
     private static Context _ctx;
 

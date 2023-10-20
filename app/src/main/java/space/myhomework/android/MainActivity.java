@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity
                         try {
                             APIClient c = APIClient.getInstance(ctx, null);
                             c.account = new APIAccount(response.getJSONObject("user"));
+                            c.prefixes.updatePrefixList(response.getJSONArray("prefixes"));
 
                             View navHeaderMain = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
 
