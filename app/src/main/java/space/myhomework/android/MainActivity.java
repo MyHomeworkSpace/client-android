@@ -47,18 +47,6 @@ public class MainActivity extends AppCompatActivity
     };
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && getTitle().equals("Homework")) {
-            // reload hw list
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
-            ((NavigationView)findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_homework);
-        } else if (hasFocus && getTitle().equals("Classes")) {
-            ((NavigationView)findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_classes);
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
