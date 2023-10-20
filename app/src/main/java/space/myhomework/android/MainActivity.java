@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
         APIClient.getInstance(this, new Runnable() {
             @Override
             public void run() {
-                APIClient.getInstance(ctx, null).makeRequest(Request.Method.GET, "auth/me", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
+                APIClient.getInstance(ctx, null).makeRequest(Request.Method.GET, "auth/context", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
