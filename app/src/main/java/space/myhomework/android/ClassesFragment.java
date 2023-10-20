@@ -1,19 +1,12 @@
 package space.myhomework.android;
 
-import android.content.Context;
-import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
-import space.myhomework.android.api.APIClass;
 import space.myhomework.android.api.APIClient;
 
 public class ClassesFragment extends Fragment {
