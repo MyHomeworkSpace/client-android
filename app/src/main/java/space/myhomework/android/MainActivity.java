@@ -4,11 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.core.view.WindowCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.view.View;
+
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -37,7 +42,7 @@ import space.myhomework.android.api.APIClass;
 import space.myhomework.android.api.APIClient;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationBarView.OnItemSelectedListener {
 
     public final Response.ErrorListener abandonHandler = new Response.ErrorListener() {
         @Override
@@ -50,6 +55,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setTitle("MyHomeworkSpace");
 
@@ -79,13 +86,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(this);
 
         APIClient.getInstance(this, new Runnable() {
             @Override
@@ -97,11 +99,6 @@ public class MainActivity extends AppCompatActivity
                             APIClient c = APIClient.getInstance(ctx, null);
                             c.account = new APIAccount(response.getJSONObject("user"));
                             c.prefixes.updatePrefixList(response.getJSONArray("prefixes"));
-
-                            View navHeaderMain = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
-
-                            ((TextView)navHeaderMain.findViewById(R.id.navName)).setText(c.account.Name);
-                            ((TextView)navHeaderMain.findViewById(R.id.navUsername)).setText(c.account.Email);
 
                             APIClient.getInstance(ctx, null).makeRequest(Request.Method.GET, "classes/get", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
                                 @Override
@@ -118,7 +115,6 @@ public class MainActivity extends AppCompatActivity
                                         }
 
                                         setTitle("Homework");
-                                        ((NavigationView)findViewById(R.id.nav_view)).setCheckedItem(R.id.nav_homework);
                                         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
 
                                         progressDialog.dismiss();
@@ -134,16 +130,6 @@ public class MainActivity extends AppCompatActivity
                 }, abandonHandler);
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -177,8 +163,6 @@ public class MainActivity extends AppCompatActivity
             setTitle(item.getTitle());
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 }
