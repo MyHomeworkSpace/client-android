@@ -1,5 +1,6 @@
 package space.myhomework.android;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -163,7 +164,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
                                             public void onResponse(JSONObject response) {
                                                 progressDialog.dismiss();
 
-                                                setResult(0);
+                                                setResult(Activity.RESULT_OK);
                                                 finish();
                                             }
                                         }, new Response.ErrorListener() {
@@ -196,8 +197,8 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && onBack()) {
-            return true;
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return onBack();
         }
 
         return super.onKeyDown(keyCode, event);
@@ -250,7 +251,9 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
     public boolean onBack() {
         if (!hasChangeBeenMade()) {
-            return false;
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+            return true;
         }
 
         new AlertDialog.Builder(this)
@@ -259,7 +262,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    setResult(0);
+                    setResult(Activity.RESULT_CANCELED);
                     finish();
                 }
             })
@@ -339,7 +342,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
 
-                        setResult(1);
+                        setResult(Activity.RESULT_OK);
                         finish();
                     }
                 }, new Response.ErrorListener() {

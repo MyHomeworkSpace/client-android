@@ -1,5 +1,6 @@
 package space.myhomework.android;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.os.Handler;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationBarView;
@@ -167,5 +169,23 @@ public class MainActivity extends AppCompatActivity
         setTitle(item.getTitle());
 
         return true;
+    }
+
+    private void reloadContents() {
+        // TODO: what if we're on classes page?
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            new Handler().post(new Runnable() {
+                public void run() {
+                    reloadContents();
+                }
+            });
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
