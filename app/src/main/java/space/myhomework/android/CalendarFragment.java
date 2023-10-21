@@ -6,26 +6,35 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
 import space.myhomework.android.api.APIClient;
+import space.myhomework.android.api.APIEvent;
+import space.myhomework.android.calendar.EventAdapter;
 import space.myhomework.android.databinding.FragmentCalendarBinding;
 
 public class CalendarFragment extends Fragment {
 
     private FragmentCalendarBinding binding;
+
     private SimpleDateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     private Date activeDay;
+
+    private ArrayList<APIEvent> events = new ArrayList<>();
 
     public CalendarFragment() {
 
@@ -40,7 +49,22 @@ public class CalendarFragment extends Fragment {
         APIClient.getInstance(getContext(), null).makeRequest(Request.Method.GET, "calendar/getView", params, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                android.util.Log.i("mhscal", response.toString());
+                try {
+                    JSONArray days = response.getJSONObject("view").getJSONArray("days");
+                    JSONObject day = days.getJSONObject(0);
+                    JSONArray eventsJSONArray = day.getJSONArray("events");
+
+                    events.clear();
+                    for (int i = 0; i < eventsJSONArray.length(); i++) {
+                        events.add(new APIEvent(eventsJSONArray.getJSONObject(i)));
+                    }
+
+                    // TODO: actually show these events
+                    binding.calendarRecyclerView.setAdapter(new EventAdapter(getContext(), events));
+                    binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, ((MainActivity)getActivity()).abandonHandler);
     }
