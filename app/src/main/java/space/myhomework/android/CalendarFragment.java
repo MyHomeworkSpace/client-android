@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -41,7 +42,7 @@ public class CalendarFragment extends Fragment {
     }
 
     private void loadDay() {
-        // TODO: loading indicator
+        binding.calendarRefreshLayout.setRefreshing(true);
 
         HashMap<String, String> params = new HashMap<>();
         params.put("start", iso8601DateFormat.format(activeDay));
@@ -62,6 +63,8 @@ public class CalendarFragment extends Fragment {
                     // TODO: actually show these events
                     binding.calendarRecyclerView.setAdapter(new EventAdapter(getContext(), events));
                     binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+                    binding.calendarRefreshLayout.setRefreshing(false);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -95,6 +98,13 @@ public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
+
+        binding.calendarRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadDay();
+            }
+        });
 
         setDate(new Date());
         loadDay();
