@@ -33,18 +33,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemEventBinding binding = ItemEventBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         View view = binding.getRoot();
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context,  Toast.LENGTH_SHORT).show();
-            }
-        });
         return new EventViewHolder(binding, view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         APIEvent event = events.get(position);
+
+        holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, event.Name, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         holder.binding.eventName.setText(event.Name);
 
