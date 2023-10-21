@@ -45,6 +45,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         subtext.append(" to ");
         subtext.append(timeFormat.format(new Date(event.End * 1000L)));
 
+        String location = (String) event.Tags.get(EventTag.LOCATION);
+        if (location != null && !location.isEmpty()) {
+            subtext.append(" at ");
+            subtext.append(location);
+        }
+
         holder.binding.eventSubtext.setText(subtext.toString());
     }
 
