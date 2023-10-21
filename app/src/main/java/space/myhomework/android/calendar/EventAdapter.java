@@ -36,7 +36,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int itemPosition = get.getChildLayoutPosition(v);
                 Toast.makeText(context,  Toast.LENGTH_SHORT).show();
             }
         });
