@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -43,7 +44,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, event.Name, Toast.LENGTH_SHORT).show();
+                new EventDetailsSheet(context, event).show();
             }
         });
 
