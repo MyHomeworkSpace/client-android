@@ -2,7 +2,9 @@ package space.myhomework.android.calendar;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,7 +32,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemEventBinding binding = ItemEventBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new EventViewHolder(binding);
+        View view = binding.getRoot();
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int itemPosition = get.getChildLayoutPosition(v);
+                Toast.makeText(context,  Toast.LENGTH_SHORT).show();
+            }
+        });
+        return new EventViewHolder(binding, view);
     }
 
     @Override
