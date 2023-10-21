@@ -53,50 +53,33 @@ public class HomeworkFragment extends Fragment {
         final Activity activity = this.getActivity();
         final ArrayList<APIClass> classes = APIClient.getInstance(getContext(), null).classes;
         final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.homeworkRefreshLayout);
-        APIClient.getInstance(getContext(), null).makeRequest(Request.Method.GET, "homework/getHWView", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
+        APIClient.getInstance(getContext(), null).makeRequest(Request.Method.GET, "homework/getHWViewSorted", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    JSONArray homework = response.getJSONArray("homework");
-
                     ArrayList<APIHomework> tomorrowList = new ArrayList<APIHomework>();
                     ArrayList<APIHomework> soonList = new ArrayList<APIHomework>();
                     ArrayList<APIHomework> longtermList = new ArrayList<APIHomework>();
 
-                    boolean isTomorrowViewMonday = false;
-                    long tomorrowViewThreshold = (1000*60*60*24); // one day
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(new Date());
-                    int dow = c.get(Calendar.DAY_OF_WEEK);
+                    JSONArray overdueJSONArray = response.getJSONArray("overdue");
+                    JSONArray tomorrowJSONArray = response.getJSONArray("tomorrow");
+                    JSONArray soonJSONArray = response.getJSONArray("soon");
+                    JSONArray longtermJSONArray = response.getJSONArray("longterm");
 
-                    if (dow == Calendar.FRIDAY || dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
-                        isTomorrowViewMonday = true;
-                        if (dow == Calendar.FRIDAY) {
-                            tomorrowViewThreshold = (1000*60*60*24*3); // three days
-                        } else if (dow == Calendar.SATURDAY) {
-                            tomorrowViewThreshold = (1000*60*60*24*2); // two days
-                        }
+                    for (int i = 0; i < overdueJSONArray.length(); i++) {
+                        tomorrowList.add(new APIHomework(overdueJSONArray.getJSONObject(i), classes));
+                    }
+                    for (int i = 0; i < tomorrowJSONArray.length(); i++) {
+                        tomorrowList.add(new APIHomework(tomorrowJSONArray.getJSONObject(i), classes));
+                    }
+                    for (int i = 0; i < soonJSONArray.length(); i++) {
+                        soonList.add(new APIHomework(soonJSONArray.getJSONObject(i), classes));
+                    }
+                    for (int i = 0; i < longtermJSONArray.length(); i++) {
+                        longtermList.add(new APIHomework(longtermJSONArray.getJSONObject(i), classes));
                     }
 
-                    for (int i = 0; i < homework.length(); i++) {
-                        JSONObject homeworkItem = homework.getJSONObject(i);
-                        APIHomework homeworkObj = new APIHomework(homeworkItem, classes);
-
-                        // WHY DOES THIS CRAPPY LANGUAGE HAVE NO GOOD BUILTIN DATE API
-                        long distanceToDue = (homeworkObj.Due.getTime() - new Date().getTime());
-
-                        if (distanceToDue < tomorrowViewThreshold) { // one day
-                            // special case - don't show overdue things if they're done
-                            if (distanceToDue < 0 && homeworkObj.Complete) {
-                                continue;
-                            }
-                            tomorrowList.add(homeworkObj);
-                        } else if (distanceToDue < (1000*60*60*24*5)) { // five days
-                            soonList.add(homeworkObj);
-                        } else { // one day
-                            longtermList.add(homeworkObj);
-                        }
-                    }
+                    // TODO: determine if we should show or tomorrow based on the response
 
                     ViewPager pager = (ViewPager)v.findViewById(R.id.homeworkPager);
 
