@@ -3,6 +3,11 @@ package space.myhomework.android.api;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
+import space.myhomework.android.calendar.EventTag;
+
 public class APIEvent {
     public int ID;
     public String UniqueID;
@@ -13,6 +18,7 @@ public class APIEvent {
     public String StartTimezone;
     public int End;
     public String EndTimezone;
+    public HashMap<EventTag, Object> Tags = new HashMap<>();
 
     public APIEvent(JSONObject o) throws JSONException {
         ID = o.getInt("id");
@@ -26,6 +32,12 @@ public class APIEvent {
         EndTimezone = o.getString("endTimezone");
 
         // TODO: recur rule
-        // TODO: tags
+
+        JSONObject tagsObject = o.getJSONObject("tags");
+        for (Iterator<String> it = tagsObject.keys(); it.hasNext(); ) {
+            String tagString = it.next();
+            EventTag tag = EventTag.fromInteger(Integer.parseInt(tagString));
+            Tags.put(tag, tagsObject.get(tagString));
+        }
     }
 }
