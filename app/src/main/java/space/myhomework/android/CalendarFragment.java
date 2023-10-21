@@ -1,5 +1,6 @@
 package space.myhomework.android;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -48,6 +50,9 @@ public class CalendarFragment extends Fragment {
         params.put("start", iso8601DateFormat.format(activeDay));
         params.put("end", iso8601DateFormat.format(calculateEnd()));
         APIClient.getInstance(getContext(), null).makeRequest(Request.Method.GET, "calendar/getView", params, new Response.Listener<JSONObject>() {
+            // TODO: lint doesn't know about desugaring for .sort()?
+            // TODO: test this on android 7
+            @SuppressLint("NewApi")
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -59,6 +64,13 @@ public class CalendarFragment extends Fragment {
                     for (int i = 0; i < eventsJSONArray.length(); i++) {
                         events.add(new APIEvent(eventsJSONArray.getJSONObject(i)));
                     }
+
+                    events.sort(new Comparator<APIEvent>() {
+                        @Override
+                        public int compare(APIEvent o1, APIEvent o2) {
+                            return o1.Start - o2.Start;
+                        }
+                    });
 
                     // TODO: actually show these events
                     binding.calendarRecyclerView.setAdapter(new EventAdapter(getContext(), events));
