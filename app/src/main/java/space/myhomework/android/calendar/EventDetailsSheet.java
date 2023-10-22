@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import space.myhomework.android.EditEventActivity;
+import space.myhomework.android.MainActivity;
 import space.myhomework.android.R;
 import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.databinding.SheetEventDetailsBinding;
@@ -71,7 +72,7 @@ public class EventDetailsSheet extends BottomSheetDialog {
                 eventExtras.putParcelable("event", e);
 
                 eventIntent.putExtras(eventExtras);
-                a.startActivityForResult(eventIntent, 1);
+                a.startActivityForResult(eventIntent, MainActivity.REQUEST_ADD_OR_EDIT_EVENT);
             }
         });
 

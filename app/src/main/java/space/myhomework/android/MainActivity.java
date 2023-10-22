@@ -46,6 +46,9 @@ import space.myhomework.android.api.APIClient;
 public class MainActivity extends AppCompatActivity
         implements NavigationBarView.OnItemSelectedListener {
 
+    public static final int REQUEST_ADD_OR_EDIT_HOMEWORK = 100;
+    public static final int REQUEST_ADD_OR_EDIT_EVENT = 200;
+
     public final Response.ErrorListener abandonHandler = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity
                     assignmentExtras.putBoolean("isNew", true);
                     assignmentExtras.putParcelableArrayList("classes", APIClient.getInstance(ctx, null).classes);
                     assignmentIntent.putExtras(assignmentExtras);
-                    startActivityForResult(assignmentIntent, 1);
+                    startActivityForResult(assignmentIntent, REQUEST_ADD_OR_EDIT_HOMEWORK);
                 } else if (getTitle().equals("Classes")) {
                     Toast.makeText(ctx, "Adding classes not supported yet!", Toast.LENGTH_SHORT).show();
                 } else {
@@ -154,12 +157,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+    private void renderViewForNavID(int id) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         if (id == R.id.nav_homework) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
         } else if (id == R.id.nav_classes) {
@@ -167,6 +166,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_calendar) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).commit();
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        renderViewForNavID(id);
 
         setTitle(item.getTitle());
 
@@ -174,8 +181,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void reloadContents() {
-        // TODO: what if we're on classes page?
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
+        // TODO: can't really reload classes page this way
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        int id = bottomNavigationView.getSelectedItemId();
+        renderViewForNavID(id);
     }
 
     @Override

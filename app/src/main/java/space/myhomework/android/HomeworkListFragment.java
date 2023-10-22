@@ -50,7 +50,7 @@ public class HomeworkListFragment extends Fragment {
                 assignmentExtras.putParcelable("homework", hw);
 
                 assignmentIntent.putExtras(assignmentExtras);
-                getActivity().startActivityForResult(assignmentIntent, 1);
+                getActivity().startActivityForResult(assignmentIntent, MainActivity.REQUEST_ADD_OR_EDIT_HOMEWORK);
             }
         });
     }
