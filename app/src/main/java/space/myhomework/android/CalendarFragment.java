@@ -73,7 +73,7 @@ public class CalendarFragment extends Fragment {
                     });
 
                     // TODO: actually show these events
-                    binding.calendarRecyclerView.setAdapter(new EventAdapter(getContext(), events));
+                    binding.calendarRecyclerView.setAdapter(new EventAdapter(getActivity(), events));
                     binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
                     binding.calendarRefreshLayout.setRefreshing(false);

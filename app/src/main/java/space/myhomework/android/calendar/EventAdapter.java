@@ -1,5 +1,6 @@
 package space.myhomework.android.calendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +20,13 @@ import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.databinding.ItemEventBinding;
 
 public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
-    private Context context;
+    private Activity activity;
     private ArrayList<APIEvent> events;
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
 
-    public EventAdapter(Context c, ArrayList<APIEvent> e) {
-        context = c;
+    public EventAdapter(Activity a, ArrayList<APIEvent> e) {
+        activity = a;
         events = e;
     }
 
@@ -44,7 +45,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new EventDetailsSheet(context, event).show();
+                new EventDetailsSheet(activity, event).show();
             }
         });
 
