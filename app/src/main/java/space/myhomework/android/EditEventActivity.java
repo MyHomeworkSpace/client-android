@@ -14,10 +14,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+import com.google.android.material.timepicker.MaterialTimePicker;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIEvent;
@@ -25,10 +34,16 @@ import space.myhomework.android.calendar.EventTag;
 import space.myhomework.android.databinding.ActivityEditEventBinding;
 
 public class EditEventActivity extends AppCompatActivity {
+    private SimpleDateFormat dateDisplayFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+    private SimpleDateFormat timeDisplayFormat = new SimpleDateFormat("h:mm a", Locale.US);
+
     private ActivityEditEventBinding binding;
 
     private boolean isNew;
     private APIEvent event;
+
+    private int start;
+    private int end;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +62,10 @@ public class EditEventActivity extends AppCompatActivity {
 
             binding.eventName.setText(event.Name);
 
+            start = event.Start;
+            end = event.End;
+            updateDateTime();
+
             String location = (String) event.Tags.get(EventTag.LOCATION);
             if (location == null) {
                 location = "";
@@ -60,12 +79,108 @@ public class EditEventActivity extends AppCompatActivity {
             binding.eventDescription.setText(description);
         }
 
+        binding.eventStartDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDatePicker(false);
+            }
+        });
+        binding.eventStartTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTimePicker(false);
+            }
+        });
+        binding.eventEndDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDatePicker(true);
+            }
+        });
+        binding.eventEndTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTimePicker(true);
+            }
+        });
+
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 save();
             }
         });
+    }
+
+    private void openDatePicker(boolean changeEnd) {
+        int targetTime = changeEnd ? end : start;
+
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder
+                .datePicker()
+                .setSelection(targetTime * 1000L)
+                .build();
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                utcCalendar.setTimeInMillis(selection);
+
+                Calendar localCalendar = GregorianCalendar.getInstance();
+                localCalendar.setTimeInMillis(targetTime * 1000L);
+
+                localCalendar.set(Calendar.YEAR, utcCalendar.get(Calendar.YEAR));
+                localCalendar.set(Calendar.MONTH, utcCalendar.get(Calendar.MONTH));
+                localCalendar.set(Calendar.DAY_OF_MONTH, utcCalendar.get(Calendar.DAY_OF_MONTH));
+
+                if (changeEnd) {
+                    end = (int) (localCalendar.getTimeInMillis() / 1000L);
+                } else {
+                    start = (int) (localCalendar.getTimeInMillis() / 1000L);
+                }
+
+                updateDateTime();
+            }
+        });
+        picker.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    private void openTimePicker(boolean changeEnd) {
+        int targetTime = changeEnd ? end : start;
+
+        Calendar localCalendar = GregorianCalendar.getInstance();
+        localCalendar.setTimeInMillis(targetTime * 1000L);
+
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setHour(localCalendar.get(Calendar.HOUR))
+                .setMinute(localCalendar.get(Calendar.MINUTE))
+                .build();
+        picker.addOnPositiveButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                localCalendar.set(Calendar.HOUR, picker.getHour());
+                localCalendar.set(Calendar.MINUTE, picker.getMinute());
+
+                if (changeEnd) {
+                    end = (int) (localCalendar.getTimeInMillis() / 1000L);
+                } else {
+                    start = (int) (localCalendar.getTimeInMillis() / 1000L);
+                }
+
+                updateDateTime();
+            }
+        });
+        picker.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    private void updateDateTime() {
+        Date startObject = new Date(start * 1000L);
+        Date endObject = new Date(end * 1000L);
+
+        binding.eventStartDateButton.setText(dateDisplayFormat.format(startObject));
+        binding.eventStartTimeButton.setText(timeDisplayFormat.format(startObject));
+
+        binding.eventEndDateButton.setText(dateDisplayFormat.format(endObject));
+        binding.eventEndTimeButton.setText(timeDisplayFormat.format(endObject));
     }
 
     private void save() {
@@ -87,8 +202,8 @@ public class EditEventActivity extends AppCompatActivity {
         final HashMap<String, String> saveParams = new HashMap<String, String>();
 
         saveParams.put("name", name);
-        saveParams.put("start", Integer.toString(event.Start));
-        saveParams.put("end", Integer.toString(event.End));
+        saveParams.put("start", Integer.toString(start));
+        saveParams.put("end", Integer.toString(end));
         saveParams.put("location", location);
         saveParams.put("desc", description);
 

@@ -23,6 +23,42 @@
             android:inputType="text"
             android:hint="Name" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:id="@+id/event_start_date_button"
+                android:layout_width="150sp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:id="@+id/event_start_time_button"
+                android:layout_width="150sp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:id="@+id/event_end_date_button"
+                android:layout_width="150sp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:id="@+id/event_end_time_button"
+                android:layout_width="150sp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart" />
+        </LinearLayout>
+
         <EditText
             android:id="@+id/event_location"
             android:layout_width="match_parent"
