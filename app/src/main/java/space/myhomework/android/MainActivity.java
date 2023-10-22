@@ -10,6 +10,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.core.view.WindowCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Handler;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity
 
     public static final int REQUEST_ADD_OR_EDIT_HOMEWORK = 100;
     public static final int REQUEST_ADD_OR_EDIT_EVENT = 200;
+
+    private Fragment activeFragment;
 
     public final Response.ErrorListener abandonHandler = new Response.ErrorListener() {
         @Override
@@ -117,7 +120,7 @@ public class MainActivity extends AppCompatActivity
                                         }
 
                                         setTitle("Homework");
-                                        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
+                                        renderViewForNavID(R.id.nav_homework);
 
                                         progressDialog.dismiss();
                                     } catch (JSONException e) {
@@ -160,17 +163,17 @@ public class MainActivity extends AppCompatActivity
     private void renderViewForNavID(int id) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (id == R.id.nav_homework) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new HomeworkFragment()).commit();
+            activeFragment = new HomeworkFragment();
         } else if (id == R.id.nav_classes) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new ClassesFragment()).commit();
+            activeFragment = new ClassesFragment();
         } else if (id == R.id.nav_calendar) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, new CalendarFragment()).commit();
+            activeFragment = new CalendarFragment();
         }
+        fragmentManager.beginTransaction().replace(R.id.content_frame, activeFragment).commit();
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         renderViewForNavID(id);
@@ -181,6 +184,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void reloadContents() {
+        // TODO: a bit hacky, probably could improve
+        if (activeFragment instanceof CalendarFragment) {
+            ((CalendarFragment) activeFragment).dismissDialogs();
+        }
+
         // TODO: can't really reload classes page this way
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         int id = bottomNavigationView.getSelectedItemId();

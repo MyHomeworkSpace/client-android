@@ -38,6 +38,7 @@ public class CalendarFragment extends Fragment {
     private Date activeDay;
 
     private ArrayList<APIEvent> events = new ArrayList<>();
+    private EventAdapter eventAdapter;
 
     public CalendarFragment() {
 
@@ -72,8 +73,8 @@ public class CalendarFragment extends Fragment {
                         }
                     });
 
-                    // TODO: actually show these events
-                    binding.calendarRecyclerView.setAdapter(new EventAdapter(getActivity(), events));
+                    eventAdapter = new EventAdapter(getActivity(), events);
+                    binding.calendarRecyclerView.setAdapter(eventAdapter);
                     binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
                     binding.calendarRefreshLayout.setRefreshing(false);
@@ -82,6 +83,12 @@ public class CalendarFragment extends Fragment {
                 }
             }
         }, ((MainActivity)getActivity()).abandonHandler);
+    }
+
+    public void dismissDialogs() {
+        if (eventAdapter != null) {
+            eventAdapter.dismissDialogs();
+        }
     }
 
     public void setDate(Date d) {

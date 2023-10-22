@@ -25,9 +25,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
 
+    private EventDetailsSheet eventDetailsSheet = null;
+
     public EventAdapter(Activity a, ArrayList<APIEvent> e) {
         activity = a;
         events = e;
+    }
+
+    public void dismissDialogs() {
+        if (eventDetailsSheet != null) {
+            eventDetailsSheet.dismiss();
+            eventDetailsSheet = null;
+        }
     }
 
     @NonNull
@@ -45,7 +54,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new EventDetailsSheet(activity, event).show();
+                eventDetailsSheet = new EventDetailsSheet(activity, event);
+                eventDetailsSheet.show();
             }
         });
 
