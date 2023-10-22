@@ -54,6 +54,14 @@ public class APIEvent implements Parcelable {
         StartTimezone = in.readString();
         End = in.readInt();
         EndTimezone = in.readString();
+
+        int tagsSize = in.readInt();
+        for (int j = 0; j < tagsSize; j++) {
+            EventTag tag = EventTag.fromInteger(in.readInt());
+
+            // TODO: this is kinda sus? what about untrusted input (is that a thing that can even happen here?)
+            Tags.put(tag, in.readValue(ClassLoader.getSystemClassLoader()));
+        }
     }
 
     @Override
@@ -72,6 +80,13 @@ public class APIEvent implements Parcelable {
         parcel.writeString(StartTimezone);
         parcel.writeInt(End);
         parcel.writeString(EndTimezone);
+
+        parcel.writeInt(Tags.size());
+        for (EventTag tag : Tags.keySet()) {
+            parcel.writeInt(tag.ordinal());
+
+            parcel.writeValue(Tags.get(tag));
+        }
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
