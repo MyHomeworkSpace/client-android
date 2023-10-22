@@ -181,6 +181,12 @@ public class EditEventActivity extends AppCompatActivity {
 
         binding.eventEndDateButton.setText(dateDisplayFormat.format(endObject));
         binding.eventEndTimeButton.setText(timeDisplayFormat.format(endObject));
+
+        if (start > end) {
+            binding.eventEndTimeButton.setError("End time must be after start");
+        } else {
+            binding.eventEndTimeButton.setError(null);
+        }
     }
 
     private void save() {
@@ -192,6 +198,23 @@ public class EditEventActivity extends AppCompatActivity {
 
         if (name.isEmpty()) {
             binding.eventName.setError("Name is required");
+            error = true;
+        } else {
+            binding.eventName.setError(null);
+        }
+
+        if (start > end) {
+            new AlertDialog.Builder(this)
+                .setMessage("The event's end time must be after its start time.")
+                .setTitle("Error")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
+
             error = true;
         }
 
