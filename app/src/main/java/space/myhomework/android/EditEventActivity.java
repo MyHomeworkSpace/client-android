@@ -115,18 +115,22 @@ public class EditEventActivity extends AppCompatActivity {
     private void openDatePicker(boolean changeEnd) {
         int targetTime = changeEnd ? end : start;
 
+        Calendar localCalendar = GregorianCalendar.getInstance();
+        localCalendar.setTimeInMillis(targetTime * 1000L);
+
+        Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utcCalendar.set(Calendar.YEAR, localCalendar.get(Calendar.YEAR));
+        utcCalendar.set(Calendar.MONTH, localCalendar.get(Calendar.MONTH));
+        utcCalendar.set(Calendar.DAY_OF_MONTH, localCalendar.get(Calendar.DAY_OF_MONTH));
+
         MaterialDatePicker<Long> picker = MaterialDatePicker.Builder
                 .datePicker()
-                .setSelection(targetTime * 1000L)
+                .setSelection(utcCalendar.getTimeInMillis())
                 .build();
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
             @Override
             public void onPositiveButtonClick(Long selection) {
-                Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                 utcCalendar.setTimeInMillis(selection);
-
-                Calendar localCalendar = GregorianCalendar.getInstance();
-                localCalendar.setTimeInMillis(targetTime * 1000L);
 
                 localCalendar.set(Calendar.YEAR, utcCalendar.get(Calendar.YEAR));
                 localCalendar.set(Calendar.MONTH, utcCalendar.get(Calendar.MONTH));
