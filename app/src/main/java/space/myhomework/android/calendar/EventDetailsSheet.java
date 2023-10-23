@@ -62,6 +62,13 @@ public class EventDetailsSheet extends BottomSheetDialog {
             binding.eventDescription.setVisibility(View.GONE);
         }
 
+        Boolean readOnly = (Boolean) e.Tags.get(EventTag.READ_ONLY);
+        if (readOnly == null) {
+            readOnly = false;
+        }
+
+        binding.eventActionEdit.setVisibility((readOnly || e.ID == -1) ? View.GONE : View.VISIBLE);
+
         binding.eventActionEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
