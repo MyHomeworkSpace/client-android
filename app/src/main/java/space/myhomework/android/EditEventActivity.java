@@ -158,7 +158,9 @@ public class EditEventActivity extends AppCompatActivity {
                 if (changeEnd) {
                     end = (int) (localCalendar.getTimeInMillis() / 1000L);
                 } else {
+                    int difference = end - start;
                     start = (int) (localCalendar.getTimeInMillis() / 1000L);
+                    end = start + difference;
                 }
 
                 updateDateTime();
@@ -186,7 +188,9 @@ public class EditEventActivity extends AppCompatActivity {
                 if (changeEnd) {
                     end = (int) (localCalendar.getTimeInMillis() / 1000L);
                 } else {
+                    int difference = end - start;
                     start = (int) (localCalendar.getTimeInMillis() / 1000L);
+                    end = start + difference;
                 }
 
                 updateDateTime();
