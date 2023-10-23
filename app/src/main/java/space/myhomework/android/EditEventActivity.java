@@ -64,7 +64,6 @@ public class EditEventActivity extends AppCompatActivity {
 
             start = event.Start;
             end = event.End;
-            updateDateTime();
 
             String location = (String) event.Tags.get(EventTag.LOCATION);
             if (location == null) {
@@ -77,7 +76,27 @@ public class EditEventActivity extends AppCompatActivity {
                 description = "";
             }
             binding.eventDescription.setText(description);
+        } else {
+            // need to choose a sane default for start and end
+
+            Calendar localCalendar = GregorianCalendar.getInstance();
+
+            // TODO: should base this off the current day that's open
+            localCalendar.setTime(new Date());
+
+            // TODO: this doesn't match what we do on the site - should probably round up, not down.
+            // TODO: what about if it's not today? still do this?
+            localCalendar.set(Calendar.SECOND, 0);
+            localCalendar.set(Calendar.MILLISECOND, 0);
+            localCalendar.set(Calendar.MINUTE, (localCalendar.get(Calendar.MINUTE) / 15) * 15);
+
+            start = (int) (localCalendar.getTimeInMillis() / 1000L);
+
+            localCalendar.add(Calendar.MINUTE, 30);
+            end = (int) (localCalendar.getTimeInMillis() / 1000L);
         }
+
+        updateDateTime();
 
         binding.eventStartDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
