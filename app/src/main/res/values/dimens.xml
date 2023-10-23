@@ -8,5 +8,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
-    <dimen name="calendar_event_sheet_peek_height">200dp</dimen>
+    <dimen name="calendar_event_sheet_peek_height">250dp</dimen>
 </resources>
