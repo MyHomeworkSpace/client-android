@@ -85,8 +85,12 @@ public class MainActivity extends AppCompatActivity
                     startActivityForResult(assignmentIntent, REQUEST_ADD_OR_EDIT_HOMEWORK);
                 } else if (getTitle().equals("Classes")) {
                     Toast.makeText(ctx, "Adding classes not supported yet!", Toast.LENGTH_SHORT).show();
-                } else {
-
+                } else if (getTitle().equals("Calendar")) {
+                    Intent eventIntent = new Intent(ctx, EditEventActivity.class);
+                    Bundle eventExtras = new Bundle();
+                    eventExtras.putBoolean("isNew", true);
+                    eventIntent.putExtras(eventExtras);
+                    startActivityForResult(eventIntent, REQUEST_ADD_OR_EDIT_EVENT);
                 }
             }
         });
