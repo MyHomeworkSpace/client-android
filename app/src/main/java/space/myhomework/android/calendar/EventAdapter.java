@@ -62,12 +62,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
             }
         });
 
+        Boolean cancelled = (Boolean) event.Tags.get(EventTag.CANCELLED);
+        if (cancelled == null) {
+            cancelled = false;
+        }
+
         String displayName = (String) event.Tags.get(EventTag.SHORT_NAME);
         if (displayName == null || displayName.isEmpty()) {
             // no short name, just use the real name
             displayName = event.Name;
         }
-        holder.binding.eventName.setText(displayName);
+        holder.binding.eventName.setText(displayName + (cancelled ? " (cancelled)" : ""));
 
         StringBuilder subtext = new StringBuilder();
 
