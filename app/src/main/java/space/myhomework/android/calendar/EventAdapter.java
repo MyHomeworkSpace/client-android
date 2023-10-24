@@ -59,7 +59,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
             }
         });
 
-        holder.binding.eventName.setText(event.Name);
+        String displayName = (String) event.Tags.get(EventTag.SHORT_NAME);
+        if (displayName == null || displayName.isEmpty()) {
+            // no short name, just use the real name
+            displayName = event.Name;
+        }
+        holder.binding.eventName.setText(displayName);
 
         StringBuilder subtext = new StringBuilder();
 
