@@ -44,7 +44,7 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void loadDay() {
+    public void loadDay() {
         binding.calendarRefreshLayout.setRefreshing(true);
 
         HashMap<String, String> params = new HashMap<>();
@@ -73,7 +73,7 @@ public class CalendarFragment extends Fragment {
                         }
                     });
 
-                    eventAdapter = new EventAdapter(getActivity(), events);
+                    eventAdapter = new EventAdapter(getActivity(), CalendarFragment.this, events);
                     binding.calendarRecyclerView.setAdapter(eventAdapter);
                     binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

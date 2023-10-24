@@ -38,7 +38,13 @@
             android:id="@+id/event_action_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="6dp"
             android:text="Edit" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/event_action_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView

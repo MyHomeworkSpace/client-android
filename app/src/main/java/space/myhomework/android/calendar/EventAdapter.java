@@ -16,19 +16,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import space.myhomework.android.CalendarFragment;
 import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.databinding.ItemEventBinding;
 
 public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
     private Activity activity;
+    private CalendarFragment fragment;
     private ArrayList<APIEvent> events;
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
 
     private EventDetailsSheet eventDetailsSheet = null;
 
-    public EventAdapter(Activity a, ArrayList<APIEvent> e) {
+    public EventAdapter(Activity a, CalendarFragment f, ArrayList<APIEvent> e) {
         activity = a;
+        fragment = f;
         events = e;
     }
 
@@ -54,7 +57,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventDetailsSheet = new EventDetailsSheet(activity, event);
+                eventDetailsSheet = new EventDetailsSheet(activity, fragment, event);
                 eventDetailsSheet.show();
             }
         });

@@ -1,21 +1,33 @@
 package space.myhomework.android.calendar;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
+import space.myhomework.android.CalendarFragment;
 import space.myhomework.android.EditEventActivity;
 import space.myhomework.android.MainActivity;
 import space.myhomework.android.R;
+import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.databinding.SheetEventDetailsBinding;
 
@@ -25,7 +37,7 @@ public class EventDetailsSheet extends BottomSheetDialog {
 
     private SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
 
-    public EventDetailsSheet(Activity a, APIEvent e) {
+    public EventDetailsSheet(Activity a, CalendarFragment f, APIEvent e) {
         super(a);
         event = e;
 
@@ -67,6 +79,16 @@ public class EventDetailsSheet extends BottomSheetDialog {
             readOnly = false;
         }
 
+        Boolean cancelled = (Boolean) e.Tags.get(EventTag.CANCELLED);
+        if (cancelled == null) {
+            cancelled = false;
+        }
+
+        Boolean cancelable = (Boolean) e.Tags.get(EventTag.CANCELABLE);
+        if (cancelable == null) {
+            cancelable = false;
+        }
+
         binding.eventActionEdit.setVisibility((readOnly || e.ID == -1) ? View.GONE : View.VISIBLE);
 
         binding.eventActionEdit.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +102,50 @@ public class EventDetailsSheet extends BottomSheetDialog {
 
                 eventIntent.putExtras(eventExtras);
                 a.startActivityForResult(eventIntent, MainActivity.REQUEST_ADD_OR_EDIT_EVENT);
+            }
+        });
+
+        binding.eventActionCancel.setVisibility(cancelable ? View.VISIBLE : View.GONE);
+        binding.eventActionCancel.setText(cancelled ? "Uncancel" : "Cancel");
+
+        Boolean finalCancelled = cancelled;
+        binding.eventActionCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // do the thing
+
+                final ProgressDialog progressDialog = ProgressDialog.show(a, "", "Updating event, please wait...", true);
+                final Context ctx = a;
+
+                final HashMap<String, String> changeParams = new HashMap<String, String>();
+
+                changeParams.put("eventID", e.UniqueID);
+                changeParams.put("cancel", Boolean.toString(!finalCancelled));
+
+                APIClient.getInstance(ctx, null).makeRequest(Request.Method.POST, "calendar/eventChanges/set", changeParams, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        dismiss();
+
+                        f.loadDay();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                        builder.setMessage("Unable to update event. Check your Internet connection.").setTitle("Error");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                });
             }
         });
 
