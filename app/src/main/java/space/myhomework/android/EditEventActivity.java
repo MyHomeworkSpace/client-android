@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -244,10 +245,67 @@ public class EditEventActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.edit_event, menu);
+        if (isNew) {
+            menu.removeItem(R.id.action_delete);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 return onBack();
+            case R.id.action_delete:
+                final Context ctx = this;
+                new AlertDialog.Builder(this)
+                        .setTitle("Delete event?")
+                        .setMessage("Are you sure you want to delete this event?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                final ProgressDialog progressDialog = ProgressDialog.show(ctx, "", "Deleting event, please wait...", true);
+
+                                APIClient.getInstance(ctx, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        final HashMap<String, String> delParams = new HashMap<String, String>();
+                                        delParams.put("id", Integer.toString(event.ID));
+                                        APIClient.getInstance(ctx, null).makeRequest(Request.Method.POST, "calendar/events/delete", delParams, new Response.Listener<JSONObject>() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+                                                progressDialog.dismiss();
+
+                                                setResult(Activity.RESULT_OK);
+                                                finish();
+                                            }
+                                        }, new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+                                                progressDialog.dismiss();
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                                                builder.setMessage("Unable to delete event. Check your Internet connection.").setTitle("Error");
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                                AlertDialog dialog = builder.create();
+                                                dialog.show();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
