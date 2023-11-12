@@ -76,16 +76,19 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getTitle().equals("Homework")) {
+                BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+                int activeNav = bottomNavigationView.getSelectedItemId();
+
+                if (activeNav == R.id.nav_homework) {
                     Intent assignmentIntent = new Intent(ctx, EditHomeworkActivity.class);
                     Bundle assignmentExtras = new Bundle();
                     assignmentExtras.putBoolean("isNew", true);
                     assignmentExtras.putParcelableArrayList("classes", APIClient.getInstance(ctx, null).classes);
                     assignmentIntent.putExtras(assignmentExtras);
                     startActivityForResult(assignmentIntent, REQUEST_ADD_OR_EDIT_HOMEWORK);
-                } else if (getTitle().equals("Classes")) {
+                } else if (activeNav == R.id.nav_classes) {
                     Toast.makeText(ctx, "Adding classes not supported yet!", Toast.LENGTH_SHORT).show();
-                } else if (getTitle().equals("Calendar")) {
+                } else if (activeNav == R.id.nav_calendar) {
                     Intent eventIntent = new Intent(ctx, EditEventActivity.class);
                     Bundle eventExtras = new Bundle();
                     eventExtras.putBoolean("isNew", true);
