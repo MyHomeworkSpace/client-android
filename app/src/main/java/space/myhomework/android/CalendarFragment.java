@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -27,6 +30,7 @@ import java.util.Locale;
 
 import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIEvent;
+import space.myhomework.android.calendar.CalendarPagerAdapter;
 import space.myhomework.android.calendar.EventAdapter;
 import space.myhomework.android.databinding.FragmentCalendarBinding;
 
@@ -38,14 +42,15 @@ public class CalendarFragment extends Fragment {
     private Date activeDay;
 
     private ArrayList<APIEvent> events = new ArrayList<>();
-    private EventAdapter eventAdapter;
+
+    private CalendarPagerAdapter pagerAdapter;
 
     public CalendarFragment() {
 
     }
 
     public void loadDay() {
-        binding.calendarRefreshLayout.setRefreshing(true);
+        pagerAdapter.setLoading(true);
 
         HashMap<String, String> params = new HashMap<>();
         params.put("start", iso8601DateFormat.format(activeDay));
@@ -73,11 +78,8 @@ public class CalendarFragment extends Fragment {
                         }
                     });
 
-                    eventAdapter = new EventAdapter(getActivity(), CalendarFragment.this, events);
-                    binding.calendarRecyclerView.setAdapter(eventAdapter);
-                    binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-                    binding.calendarRefreshLayout.setRefreshing(false);
+                    pagerAdapter.setEvents(events);
+                    pagerAdapter.setLoading(false);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -86,9 +88,7 @@ public class CalendarFragment extends Fragment {
     }
 
     public void dismissDialogs() {
-        if (eventAdapter != null) {
-            eventAdapter.dismissDialogs();
-        }
+        pagerAdapter.dismissDialogs();
     }
 
     public void setDate(Date d) {
@@ -118,10 +118,29 @@ public class CalendarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
 
-        binding.calendarRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        pagerAdapter = new CalendarPagerAdapter(getActivity(), this);
+        binding.calendarPager.setAdapter(pagerAdapter);
+        binding.calendarPager.setCurrentItem(1, false);
+
+        // HACK: this is how we maintain the illusion of infinite scroll
+        // we let the user scroll from page 1 to either 0 or 2, then reset it back to page 1 without animation
+        // (if you scroll fast this kinda falls apart - but doing it properly seems complicated)
+        binding.calendarPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public void onRefresh() {
-                loadDay();
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    int curr = binding.calendarPager.getCurrentItem();
+
+                    // first check that we actually moved
+                    if (curr != 1) {
+                        int direction = (curr == 0 ? -1 : 1);
+
+                        // TODO: update day
+
+                        binding.calendarPager.setCurrentItem(1, false);
+                    }
+                }
+                super.onPageScrollStateChanged(state);
             }
         });
 
