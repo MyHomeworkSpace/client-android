@@ -46,6 +46,8 @@ public class EditEventActivity extends AppCompatActivity {
     private int start;
     private int end;
 
+    private int initialStart;
+    private int initialEnd;
     private String initialLocation;
     private String initialDescription;
 
@@ -104,6 +106,9 @@ public class EditEventActivity extends AppCompatActivity {
             initialLocation = "";
             initialDescription = "";
         }
+
+        initialStart = start;
+        initialEnd = end;
 
         updateDateTime();
 
@@ -245,11 +250,11 @@ public class EditEventActivity extends AppCompatActivity {
             return true;
         }
 
-        if (start != event.Start) {
+        if (start != initialStart) {
             return true;
         }
 
-        if (end != event.End) {
+        if (end != initialEnd) {
             return true;
         }
 
