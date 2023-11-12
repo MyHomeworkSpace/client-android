@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -45,6 +46,9 @@ public class EditEventActivity extends AppCompatActivity {
     private int start;
     private int end;
 
+    private String initialLocation;
+    private String initialDescription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,12 +74,14 @@ public class EditEventActivity extends AppCompatActivity {
                 location = "";
             }
             binding.eventLocation.setText(location);
+            initialLocation = location;
 
             String description = (String) event.Tags.get(EventTag.DESCRIPTION);
             if (description == null) {
                 description = "";
             }
             binding.eventDescription.setText(description);
+            initialDescription = description;
         } else {
             // need to choose a sane default for start and end
 
@@ -94,6 +100,9 @@ public class EditEventActivity extends AppCompatActivity {
 
             localCalendar.add(Calendar.MINUTE, 30);
             end = (int) (localCalendar.getTimeInMillis() / 1000L);
+
+            initialLocation = "";
+            initialDescription = "";
         }
 
         updateDateTime();
@@ -214,6 +223,67 @@ public class EditEventActivity extends AppCompatActivity {
         } else {
             binding.eventEndTimeButton.setError(null);
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return onBack();
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public boolean hasChangeBeenMade() {
+        String name = binding.eventName.getText().toString();
+        String location = binding.eventLocation.getText().toString();
+        String description = binding.eventDescription.getText().toString();
+
+        String initialName = event != null ? event.Name : "";
+
+        if (!name.equals(initialName)) {
+            return true;
+        }
+
+        if (start != event.Start) {
+            return true;
+        }
+
+        if (end != event.End) {
+            return true;
+        }
+
+        if (!location.equals(initialLocation)) {
+            return true;
+        }
+
+        if (!description.equals(initialDescription)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean onBack() {
+        if (!hasChangeBeenMade()) {
+            setResult(Activity.RESULT_CANCELED);
+            finish();
+            return true;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Leave without saving?")
+                .setMessage("Are you sure you want to discard your changes?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setResult(Activity.RESULT_CANCELED);
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+        return true;
     }
 
     private void save() {
