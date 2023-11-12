@@ -68,8 +68,11 @@ public class EditEventActivity extends AppCompatActivity {
 
             binding.eventName.setText(event.Name);
 
-            start = event.Start;
-            end = event.End;
+            Integer originalStart = (Integer) event.Tags.get(EventTag.ORIGINAL_START);
+            Integer originalEnd = (Integer) event.Tags.get(EventTag.ORIGINAL_END);
+
+            start = originalStart != null ? originalStart : event.Start;
+            end = originalEnd != null ? originalEnd : event.End;
 
             String location = (String) event.Tags.get(EventTag.LOCATION);
             if (location == null) {
