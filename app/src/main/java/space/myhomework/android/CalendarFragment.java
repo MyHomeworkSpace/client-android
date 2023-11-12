@@ -104,6 +104,16 @@ public class CalendarFragment extends Fragment {
         activeDay = c.getTime();
     }
 
+    public void setDateByOffset(int dayOffset) {
+        Calendar c = Calendar.getInstance();
+
+        c.setTime(activeDay);
+
+        c.add(Calendar.DAY_OF_MONTH, dayOffset);
+
+        activeDay = c.getTime();
+    }
+
     private Date calculateEnd() {
         Calendar c = Calendar.getInstance();
 
@@ -135,7 +145,9 @@ public class CalendarFragment extends Fragment {
                     if (curr != 1) {
                         int direction = (curr == 0 ? -1 : 1);
 
-                        // TODO: update day
+                        pagerAdapter.setEvents(new ArrayList<APIEvent>());
+                        setDateByOffset(direction);
+                        loadDay();
 
                         binding.calendarPager.setCurrentItem(1, false);
                     }
