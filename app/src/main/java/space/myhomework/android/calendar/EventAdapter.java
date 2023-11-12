@@ -62,6 +62,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
             }
         });
 
+        boolean recurrent = event.RecurRule != null;
+
         Boolean cancelled = (Boolean) event.Tags.get(EventTag.CANCELLED);
         if (cancelled == null) {
             cancelled = false;
@@ -72,7 +74,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
             // no short name, just use the real name
             displayName = event.Name;
         }
-        holder.binding.eventName.setText(displayName + (cancelled ? " (cancelled)" : ""));
+        holder.binding.eventName.setText(displayName + (recurrent ? " (recurrent)" : "") + (cancelled ? " (cancelled)" : ""));
 
         StringBuilder subtext = new StringBuilder();
 
