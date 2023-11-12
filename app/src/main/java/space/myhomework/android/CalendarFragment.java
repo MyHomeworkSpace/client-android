@@ -39,6 +39,7 @@ public class CalendarFragment extends Fragment {
     private FragmentCalendarBinding binding;
 
     private SimpleDateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private SimpleDateFormat friendlyDateFormat = new SimpleDateFormat("E, MMMM d, yyyy", Locale.US);
     private Date activeDay;
 
     private ArrayList<APIEvent> events = new ArrayList<>();
@@ -50,6 +51,8 @@ public class CalendarFragment extends Fragment {
     }
 
     public void loadDay() {
+        getActivity().setTitle(friendlyDateFormat.format(activeDay));
+
         pagerAdapter.setLoading(true);
 
         HashMap<String, String> params = new HashMap<>();
