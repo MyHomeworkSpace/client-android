@@ -21,6 +21,9 @@ public class APIEvent implements Parcelable {
     public String StartTimezone;
     public int End;
     public String EndTimezone;
+
+    public APIRecurRule RecurRule;
+
     public HashMap<EventTag, Object> Tags = new HashMap<>();
 
     public APIEvent(JSONObject o) throws JSONException {
@@ -34,7 +37,11 @@ public class APIEvent implements Parcelable {
         End = o.getInt("end");
         EndTimezone = o.getString("endTimezone");
 
-        // TODO: recur rule
+        if (!o.isNull("recurRule")) {
+            RecurRule = new APIRecurRule(o.getJSONObject("recurRule"));
+        } else {
+            RecurRule = null;
+        }
 
         JSONObject tagsObject = o.getJSONObject("tags");
         for (Iterator<String> it = tagsObject.keys(); it.hasNext(); ) {
@@ -54,6 +61,13 @@ public class APIEvent implements Parcelable {
         StartTimezone = in.readString();
         End = in.readInt();
         EndTimezone = in.readString();
+
+        boolean haveRecurRule = in.readInt() > 0;
+        if (haveRecurRule) {
+            RecurRule = new APIRecurRule(in);
+        } else {
+            RecurRule = null;
+        }
 
         int tagsSize = in.readInt();
         for (int j = 0; j < tagsSize; j++) {
@@ -80,6 +94,12 @@ public class APIEvent implements Parcelable {
         parcel.writeString(StartTimezone);
         parcel.writeInt(End);
         parcel.writeString(EndTimezone);
+
+        boolean haveRecurRule = RecurRule != null;
+        parcel.writeInt(haveRecurRule ? 1 : 0);
+        if (haveRecurRule) {
+            RecurRule.writeToParcel(parcel, i);
+        }
 
         parcel.writeInt(Tags.size());
         for (EventTag tag : Tags.keySet()) {

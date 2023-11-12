@@ -335,8 +335,16 @@ public class EditEventActivity extends AppCompatActivity {
         saveParams.put("location", location);
         saveParams.put("desc", description);
 
-        // TODO: this is bad
-        saveParams.put("recur", "false");
+        if (event != null && event.RecurRule != null) {
+            saveParams.put("recur", "true");
+            saveParams.put("recurFrequency", Integer.toString(event.RecurRule.Frequency.ordinal()));
+            saveParams.put("recurInterval", Integer.toString(event.RecurRule.Interval));
+            if (!event.RecurRule.Until.isEmpty()) {
+                saveParams.put("recurUntil", event.RecurRule.Until);
+            }
+        } else {
+            saveParams.put("recur", "false");
+        }
 
         final String saveURL = (isNew ? "calendar/events/add" : "calendar/events/edit");
 
