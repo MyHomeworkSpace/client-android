@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -240,6 +241,16 @@ public class EditEventActivity extends AppCompatActivity {
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                return onBack();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public boolean hasChangeBeenMade() {
