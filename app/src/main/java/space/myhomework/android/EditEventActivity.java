@@ -90,18 +90,21 @@ public class EditEventActivity extends AppCompatActivity {
             binding.eventDescription.setText(description);
             initialDescription = description;
         } else {
-            // need to choose a sane default for start and end
+            // need to choose a sane default for start and
+            Calendar now = GregorianCalendar.getInstance();
+            now.setTime(new Date());
 
             Calendar localCalendar = GregorianCalendar.getInstance();
+            long date = params.getLong("activeDayTimestamp", new Date().getTime());
 
-            // TODO: should base this off the current day that's open
-            localCalendar.setTime(new Date());
+            localCalendar.setTime(new Date(date));
 
             // TODO: this doesn't match what we do on the site - should probably round up, not down.
             // TODO: what about if it's not today? still do this?
             localCalendar.set(Calendar.SECOND, 0);
             localCalendar.set(Calendar.MILLISECOND, 0);
-            localCalendar.set(Calendar.MINUTE, (localCalendar.get(Calendar.MINUTE) / 15) * 15);
+            localCalendar.set(Calendar.MINUTE, (now.get(Calendar.MINUTE) / 15) * 15);
+            localCalendar.set(Calendar.HOUR, now.get(Calendar.HOUR));
 
             start = (int) (localCalendar.getTimeInMillis() / 1000L);
 
