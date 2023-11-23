@@ -92,6 +92,9 @@ public class MainActivity extends AppCompatActivity
                     Intent eventIntent = new Intent(ctx, EditEventActivity.class);
                     Bundle eventExtras = new Bundle();
                     eventExtras.putBoolean("isNew", true);
+                    if (activeFragment instanceof CalendarFragment) {
+                        eventExtras.putLong("activeDayTimestamp", ((CalendarFragment) activeFragment).getDate().getTime());
+                    }
                     eventIntent.putExtras(eventExtras);
                     startActivityForResult(eventIntent, REQUEST_ADD_OR_EDIT_EVENT);
                 }

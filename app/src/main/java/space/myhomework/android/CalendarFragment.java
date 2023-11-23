@@ -94,6 +94,10 @@ public class CalendarFragment extends Fragment {
         pagerAdapter.dismissDialogs();
     }
 
+    public Date getDate() {
+        return activeDay;
+    }
+
     public void setDate(Date d) {
         Calendar c = Calendar.getInstance();
 
