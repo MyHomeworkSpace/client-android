@@ -77,5 +77,14 @@ public class CalendarDayFragment extends Fragment {
         eventAdapter = new EventAdapter(getActivity(), calendarFragment, events);
         binding.calendarRecyclerView.setAdapter(eventAdapter);
         binding.calendarRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // TODO: relying on the refreshing state is a bit of a hack, relies on the order of function calls
+        if (events.isEmpty() && binding.calendarRefreshLayout.isRefreshing()) {
+            binding.calendarRecyclerView.setVisibility(View.GONE);
+            binding.calendarNoEvents.setVisibility(View.VISIBLE);
+        } else {
+            binding.calendarRecyclerView.setVisibility(View.VISIBLE);
+            binding.calendarNoEvents.setVisibility(View.GONE);
+        }
     }
 }
