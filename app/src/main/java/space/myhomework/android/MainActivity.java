@@ -197,6 +197,12 @@ public class MainActivity extends AppCompatActivity
         // TODO: a bit hacky, probably could improve
         if (activeFragment instanceof CalendarFragment) {
             ((CalendarFragment) activeFragment).dismissDialogs();
+
+            // we don't want to remake the fragment because that would reset it to today
+            // so instead we just ask it directly to reload
+            // TODO: this is hacky and should be done in a more generic way
+            ((CalendarFragment) activeFragment).loadDay();
+            return;
         }
 
         // TODO: can't really reload classes page this way
