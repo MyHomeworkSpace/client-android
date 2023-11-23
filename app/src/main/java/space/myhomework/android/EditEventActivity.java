@@ -90,13 +90,14 @@ public class EditEventActivity extends AppCompatActivity {
             binding.eventDescription.setText(description);
             initialDescription = description;
         } else {
-            // need to choose a sane default for start and
+            // use current date so that we can set a default time (hours and minutes)
             Calendar now = GregorianCalendar.getInstance();
             now.setTime(new Date());
 
+            // set our start date based on what we were provided
+            // (or, if nothing was provided, then default to today)
             Calendar localCalendar = GregorianCalendar.getInstance();
             long date = params.getLong("activeDayTimestamp", new Date().getTime());
-
             localCalendar.setTime(new Date(date));
 
             // TODO: this doesn't match what we do on the site - should probably round up, not down.
