@@ -45,6 +45,9 @@ public class HomeworkAdapter extends ArrayAdapter<APIHomework> {
             overdue = true;
             dueView.setTextColor(Color.RED);
             classView.setTextColor(Color.RED);
+        } else {
+            dueView.setTextColor(Color.BLACK);
+            classView.setTextColor(Color.BLACK);
         }
 
         String hwNameStr = hw.Name;
