@@ -161,6 +161,7 @@ public class CalendarFragment extends Fragment {
                     if (curr != 1) {
                         int direction = (curr == 0 ? -1 : 1);
 
+                        pagerAdapter.setAnnouncements(new ArrayList<APIAnnouncement>());
                         pagerAdapter.setEvents(new ArrayList<APIEvent>());
                         setDateByOffset(direction);
                         loadDay();
