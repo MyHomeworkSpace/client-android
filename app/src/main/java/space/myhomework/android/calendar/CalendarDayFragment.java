@@ -95,6 +95,8 @@ public class CalendarDayFragment extends Fragment {
             // TODO: this view should be, like, inflated from an XML file or something
             TextView announcementView = new TextView(getContext());
 
+            announcementView.setBackgroundColor(0xFFE3E3E3);
+
             announcementView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             announcementView.setGravity(Gravity.CENTER);
 
@@ -102,7 +104,7 @@ public class CalendarDayFragment extends Fragment {
             // see https://stackoverflow.com/q/10420077/2178519
             announcementView.setText(Html.fromHtml("<i>" + Html.escapeHtml(announcement.Text) + "</i>"));
 
-            announcementView.setPadding(0, dpToPx(8), 0, 0);
+            announcementView.setPadding(0, dpToPx(8), 0, dpToPx(8));
 
             TypedValue value = new TypedValue();
             getContext().getTheme().resolveAttribute(android.R.attr.textAppearanceListItem, value, true);
