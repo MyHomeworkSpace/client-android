@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+import space.myhomework.android.api.APIAnnouncement;
 import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.calendar.CalendarPagerAdapter;
@@ -42,6 +43,7 @@ public class CalendarFragment extends Fragment {
     private SimpleDateFormat friendlyDateFormat = new SimpleDateFormat("E, MMMM d, yyyy", Locale.US);
     private Date activeDay;
 
+    private ArrayList<APIAnnouncement> announcements = new ArrayList<>();
     private ArrayList<APIEvent> events = new ArrayList<>();
 
     private CalendarPagerAdapter pagerAdapter;
@@ -67,8 +69,14 @@ public class CalendarFragment extends Fragment {
                 try {
                     JSONArray days = response.getJSONObject("view").getJSONArray("days");
                     JSONObject day = days.getJSONObject(0);
-                    JSONArray eventsJSONArray = day.getJSONArray("events");
 
+                    JSONArray announcementsJSONArray = day.getJSONArray("announcements");
+                    announcements.clear();
+                    for (int i = 0; i < announcementsJSONArray.length(); i++) {
+                        announcements.add(new APIAnnouncement(announcementsJSONArray.getJSONObject(i)));
+                    }
+
+                    JSONArray eventsJSONArray = day.getJSONArray("events");
                     events.clear();
                     for (int i = 0; i < eventsJSONArray.length(); i++) {
                         events.add(new APIEvent(eventsJSONArray.getJSONObject(i)));
@@ -81,6 +89,7 @@ public class CalendarFragment extends Fragment {
                         }
                     });
 
+                    pagerAdapter.setAnnouncements(announcements);
                     pagerAdapter.setEvents(events);
                     pagerAdapter.setLoading(false);
                 } catch (JSONException e) {

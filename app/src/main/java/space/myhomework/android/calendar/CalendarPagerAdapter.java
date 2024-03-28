@@ -8,6 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import java.util.ArrayList;
 
 import space.myhomework.android.CalendarFragment;
+import space.myhomework.android.api.APIAnnouncement;
 import space.myhomework.android.api.APIEvent;
 
 public class CalendarPagerAdapter extends FragmentStateAdapter {
@@ -42,6 +43,10 @@ public class CalendarPagerAdapter extends FragmentStateAdapter {
 
     public void setLoading(boolean loading) {
         mainDay.setLoading(loading);
+    }
+
+    public void setAnnouncements(ArrayList<APIAnnouncement> announcements) {
+        mainDay.setAnnouncements(announcements);
     }
 
     public void setEvents(ArrayList<APIEvent> events) {

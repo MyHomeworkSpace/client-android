@@ -1,9 +1,13 @@
 package space.myhomework.android.calendar;
 
 import android.os.Bundle;
+import android.text.Html;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.ArrayList;
 
 import space.myhomework.android.CalendarFragment;
+import space.myhomework.android.api.APIAnnouncement;
 import space.myhomework.android.api.APIEvent;
 import space.myhomework.android.databinding.FragmentCalendarDayBinding;
 
@@ -21,6 +26,7 @@ public class CalendarDayFragment extends Fragment {
     private EventAdapter eventAdapter;
 
     private Boolean queuedLoading;
+    private ArrayList<APIAnnouncement> queuedAnnouncements;
     private ArrayList<APIEvent> queuedEvents;
 
     private CalendarFragment calendarFragment;
@@ -45,6 +51,11 @@ public class CalendarDayFragment extends Fragment {
             queuedLoading = null;
         }
 
+        if (queuedAnnouncements != null) {
+            setAnnouncements(queuedAnnouncements);
+            queuedAnnouncements = null;
+        }
+
         if (queuedEvents != null) {
             setEvents(queuedEvents);
             queuedEvents = null;
@@ -66,6 +77,39 @@ public class CalendarDayFragment extends Fragment {
         }
 
         binding.calendarRefreshLayout.setRefreshing(loading);
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    public void setAnnouncements(ArrayList<APIAnnouncement> announcements) {
+        if (binding == null) {
+            queuedAnnouncements = announcements;
+            return;
+        }
+
+        // TODO: we should probably use a RecyclerView or something like that here?
+        binding.calendarAnnouncements.removeAllViews();
+        for (APIAnnouncement announcement : announcements) {
+            // TODO: this view should be, like, inflated from an XML file or something
+            TextView announcementView = new TextView(getContext());
+
+            announcementView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            announcementView.setGravity(Gravity.CENTER);
+
+            // this is a big hack to work around what seems to be a bug?
+            // see https://stackoverflow.com/q/10420077/2178519
+            announcementView.setText(Html.fromHtml("<i>" + Html.escapeHtml(announcement.Text) + "</i>"));
+
+            announcementView.setPadding(0, dpToPx(8), 0, 0);
+
+            TypedValue value = new TypedValue();
+            getContext().getTheme().resolveAttribute(android.R.attr.textAppearanceListItem, value, true);
+            announcementView.setTextAppearance(value.resourceId);
+
+            binding.calendarAnnouncements.addView(announcementView);
+        }
     }
 
     public void setEvents(ArrayList<APIEvent> events) {
