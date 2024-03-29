@@ -12,7 +12,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main_frame_layout"
-    android:paddingTop="36dp"
     tools:context="space.myhomework.android.MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

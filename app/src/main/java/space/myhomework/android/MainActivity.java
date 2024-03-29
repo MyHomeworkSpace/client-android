@@ -68,6 +68,18 @@ public class MainActivity extends AppCompatActivity
 
         setTitle("MyHomeworkSpace");
 
+        // TODO: for some reason, I cannot find a good way of handling this
+        // ("this" meaning showing the top navbar under the system status bar, and showing the bottom tabbar under the system nav bar)
+        // it works for the bottom but not the top
+        // so, manually hack the top into working
+        // I think maybe related: https://stackoverflow.com/a/73938386/2178519
+        int statusBarHeight = 0;
+        int statusBarHeightID = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (statusBarHeightID != -1) {
+            statusBarHeight = getResources().getDimensionPixelSize(statusBarHeightID);
+        }
+        findViewById(R.id.main_frame_layout).setPadding(0, statusBarHeight, 0, 0);
+
         final Context ctx = this;
         final ProgressDialog progressDialog = ProgressDialog.show(this, "", "Loading, please wait...", true);
         progressDialog.show();
