@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "space.myhomework.android"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 1
         versionName "0.1.0"
     }
