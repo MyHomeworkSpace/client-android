@@ -53,6 +53,7 @@ public class EditHomeworkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_homework);
+        WindowInsetsHelper.applyToContent(this, true);
 
         Bundle params = getIntent().getExtras();
         isNew = params.getBoolean("isNew");

@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    HACK: we tell the system that we can fit its windows because we want that for the bottom navigation
-    however, this is a lie for the top action bar (because we don't want to be under it)
-    so, we need to add matching padding to the top
-    and right now, it's just hardcoded :(
--->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

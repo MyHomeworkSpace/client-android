@@ -59,6 +59,7 @@ public class EditEventActivity extends AppCompatActivity {
 
         binding = ActivityEditEventBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        WindowInsetsHelper.applyToContent(this, true);
 
         Bundle params = getIntent().getExtras();
         isNew = params.getBoolean("isNew");

@@ -13,6 +13,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        WindowInsetsHelper.applyToContent(this, true);
     }
 
     public void deleteAccount(View view) {

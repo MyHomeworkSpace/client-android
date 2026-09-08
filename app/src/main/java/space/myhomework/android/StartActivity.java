@@ -55,6 +55,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        WindowInsetsHelper.applyToContent(this, true);
         loadDialog = ProgressDialog.show(StartActivity.this, "", "Loading, please wait...", true);
 
         final Context ctx = this;

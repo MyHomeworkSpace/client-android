@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTitle("Log in");
         setContentView(R.layout.activity_login);
+        WindowInsetsHelper.applyToContent(this, true);
 
         ((EditText)findViewById(R.id.password)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
