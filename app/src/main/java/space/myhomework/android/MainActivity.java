@@ -68,8 +68,11 @@ public class MainActivity extends AppCompatActivity
 
         setTitle("MyHomeworkSpace");
 
-        // The bottom navigation applies its own bottom inset, so only pad the top here.
-        WindowInsetsHelper.applyToContent(this, false);
+        // BottomNavigationView insets itself on its sides and bottom, so padding the content
+        // root horizontally would double up on it and pull its background off the screen edges.
+        // Pad only the top there, and inset the content area's sides on their own.
+        WindowInsetsHelper.applyTo(findViewById(android.R.id.content), false, true, false, false);
+        WindowInsetsHelper.applyTo(findViewById(R.id.content_main), true, false, true, false);
 
         final Context ctx = this;
         final ProgressDialog progressDialog = ProgressDialog.show(this, "", "Loading, please wait...", true);
