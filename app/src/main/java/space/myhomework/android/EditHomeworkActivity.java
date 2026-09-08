@@ -5,16 +5,20 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,11 +53,23 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
     private Date dueDate;
 
+    /**
+     * Handles back only while there are unsaved changes to confirm. Left disabled otherwise so the
+     * system can run its own back animation, which it can't do once we intercept the gesture.
+     */
+    private final OnBackPressedCallback unsavedChangesCallback = new OnBackPressedCallback(false) {
+        @Override
+        public void handleOnBackPressed() {
+            onBack();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_homework);
         WindowInsetsHelper.applyToContent(this, true);
+        getOnBackPressedDispatcher().addCallback(this, unsavedChangesCallback);
 
         Bundle params = getIntent().getExtras();
         isNew = params.getBoolean("isNew");
@@ -97,11 +113,46 @@ public class EditHomeworkActivity extends AppCompatActivity {
                 save();
             }
         });
+
+        TextWatcher changeWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateUnsavedChanges();
+            }
+        };
+        ((EditText) findViewById(R.id.homeworkName)).addTextChangedListener(changeWatcher);
+        ((EditText) findViewById(R.id.homeworkDesc)).addTextChangedListener(changeWatcher);
+        classSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateUnsavedChanges();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                updateUnsavedChanges();
+            }
+        });
+        ((CheckBox) findViewById(R.id.homeworkDone)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateUnsavedChanges();
+            }
+        });
+
+        updateUnsavedChanges();
     }
 
     public void setDate(Date d) {
         dueDate = d;
         ((TextView)findViewById(R.id.homeworkDueText)).setText("due " + new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US).format(dueDate));
+        updateUnsavedChanges();
     }
 
     public void openDueDateDialog(View v) {
@@ -196,13 +247,8 @@ public class EditHomeworkActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return onBack();
-        }
-
-        return super.onKeyDown(keyCode, event);
+    private void updateUnsavedChanges() {
+        unsavedChangesCallback.setEnabled(hasChangeBeenMade());
     }
 
     public boolean hasChangeBeenMade() {

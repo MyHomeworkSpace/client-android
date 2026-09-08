@@ -5,12 +5,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,6 +55,17 @@ public class EditEventActivity extends AppCompatActivity {
     private String initialLocation;
     private String initialDescription;
 
+    /**
+     * Handles back only while there are unsaved changes to confirm. Left disabled otherwise so the
+     * system can run its own back animation, which it can't do once we intercept the gesture.
+     */
+    private final OnBackPressedCallback unsavedChangesCallback = new OnBackPressedCallback(false) {
+        @Override
+        public void handleOnBackPressed() {
+            onBack();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +73,7 @@ public class EditEventActivity extends AppCompatActivity {
         binding = ActivityEditEventBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.applyToContent(this, true);
+        getOnBackPressedDispatcher().addCallback(this, unsavedChangesCallback);
 
         Bundle params = getIntent().getExtras();
         isNew = params.getBoolean("isNew");
@@ -153,6 +167,24 @@ public class EditEventActivity extends AppCompatActivity {
                 save();
             }
         });
+
+        TextWatcher changeWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateUnsavedChanges();
+            }
+        };
+        binding.eventName.addTextChangedListener(changeWatcher);
+        binding.eventLocation.addTextChangedListener(changeWatcher);
+        binding.eventDescription.addTextChangedListener(changeWatcher);
+
+        updateUnsavedChanges();
     }
 
     private void openDatePicker(boolean changeEnd) {
@@ -238,15 +270,12 @@ public class EditEventActivity extends AppCompatActivity {
         } else {
             binding.eventEndTimeButton.setError(null);
         }
+
+        updateUnsavedChanges();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return onBack();
-        }
-
-        return super.onKeyDown(keyCode, event);
+    private void updateUnsavedChanges() {
+        unsavedChangesCallback.setEnabled(hasChangeBeenMade());
     }
 
     @Override
