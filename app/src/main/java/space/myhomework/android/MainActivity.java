@@ -165,15 +165,19 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+
+            return true;
         } else if (id == R.id.nav_log_out) {
             APIClient.clearInstance();
             File file = new File(this.getFilesDir(), "session_id");
             file.delete();
             setResult(1);
             finish();
+
+            return true;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void renderViewForNavID(int id) {
