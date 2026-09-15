@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity
                             APIClient c = APIClient.getInstance(ctx, null);
                             c.account = new APIAccount(response.getJSONObject("user"));
                             c.prefixes.updatePrefixList(response.getJSONArray("prefixes"));
+                            c.updatePrefs(response.getJSONArray("prefs"));
 
                             APIClient.getInstance(ctx, null).makeRequest(Request.Method.GET, "classes/get", new HashMap<String, String>(), new Response.Listener<JSONObject>() {
                                 @Override

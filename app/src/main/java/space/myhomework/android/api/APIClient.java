@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,6 +59,7 @@ public class APIClient {
     public APIAccount account;
     public ArrayList<APIClass> classes;
     public PrefixManager prefixes = new PrefixManager();
+    public HashMap<String, String> prefs = new HashMap<String, String>();
 
     private static Context _ctx;
 
@@ -110,6 +112,19 @@ public class APIClient {
                 }
             }
         });
+    }
+
+    public void updatePrefs(JSONArray prefsObj) throws JSONException {
+        prefs = new HashMap<String, String>();
+        for (int i = 0; i < prefsObj.length(); i++) {
+            JSONObject prefObj = prefsObj.getJSONObject(i);
+            prefs.put(prefObj.getString("key"), prefObj.getString("value"));
+        }
+    }
+
+    // an unset preference is treated as false, matching the web client
+    public boolean getBoolPref(String key) {
+        return "true".equals(prefs.get(key));
     }
 
     public String getCookieValue(String name) {
