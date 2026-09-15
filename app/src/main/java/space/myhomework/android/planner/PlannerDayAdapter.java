@@ -13,16 +13,26 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import space.myhomework.android.EditHomeworkActivity;
 import space.myhomework.android.MainActivity;
 import space.myhomework.android.PrefixInfo;
+import space.myhomework.android.R;
 import space.myhomework.android.api.APIClass;
 import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIHomework;
@@ -34,6 +44,10 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_HOMEWORK = 1;
     private static final int TYPE_EMPTY = 2;
+
+    // passed with notifyItemRangeChanged so that RecyclerView rebinds the existing view holders in place
+    // without a payload, the default item animator cross-fades in new ones, which cuts off the checkbox animation
+    private static final Object PAYLOAD_TOGGLE = new Object();
 
     // one entry per row in the list, in order
     // a header row has a class, a homework row has homework, and an empty row has neither
@@ -56,13 +70,15 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
     }
 
     private Activity activity;
+    private Date day;
     private ArrayList<Row> rows = new ArrayList<>();
 
     public PlannerDayAdapter(Activity a) {
         activity = a;
     }
 
-    public void setWeek(PlannerWeek week, Date day) {
+    public void setWeek(PlannerWeek week, Date d) {
+        day = d;
         rows = new ArrayList<>();
 
         ArrayList<APIClass> classes = APIClient.getInstance(activity, null).classes;
@@ -99,6 +115,38 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         }
 
         notifyDataSetChanged();
+    }
+
+    // flips the homework's done state straight away, then tells the server
+    // the APIHomework object lives in the cached PlannerWeek, so every page showing it sees the change
+    private void toggleComplete(final APIHomework hw, final boolean complete) {
+        hw.Complete = complete;
+        int position = positionOf(hw);
+        if (position != -1) {
+            refreshSection(position);
+        }
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", Integer.toString(hw.ID));
+        params.put("name", hw.Name);
+        params.put("due", PlannerDates.formatISO(hw.Due));
+        params.put("desc", hw.Description == null ? "" : hw.Description);
+        params.put("complete", (complete ? "1" : "0"));
+        params.put("classId", Integer.toString(hw.ClassID));
+
+        APIClient.getInstance(activity, null).makeRequest(Request.Method.POST, "homework/edit", params, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                // nothing to do: the optimistic state is already right, and a reload would flash the spinner
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                hw.Complete = !complete;
+
+                Toast.makeText(activity, "Couldn't update homework", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -193,7 +241,15 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             binding.plannerHwDescription.setText(hw.Description);
         }
 
+        // a click listener rather than a checked-change listener, so setting the state here doesn't count as a toggle
         binding.plannerHwCheckbox.setChecked(hw.Complete);
+        binding.plannerHwCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // the checkbox has already flipped itself by the time we hear about it
+                toggleComplete(hw, binding.plannerHwCheckbox.isChecked());
+            }
+        });
 
         // view holders get reused, so make sure to undo this too
         if (hw.Complete) {
