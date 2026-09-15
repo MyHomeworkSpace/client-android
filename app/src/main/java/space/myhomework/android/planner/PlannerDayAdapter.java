@@ -154,6 +154,24 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         binding.plannerClassDot.getBackground().mutate().setTint(color);
         binding.plannerClassName.setText(apiClass.Name);
         binding.plannerClassName.setTextColor(color);
+
+        binding.plannerClassAdd.setContentDescription("Add homework for " + apiClass.Name);
+        binding.plannerClassAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent assignmentIntent = new Intent(activity, EditHomeworkActivity.class);
+                Bundle assignmentExtras = new Bundle();
+
+                assignmentExtras.putBoolean("isNew", true);
+                assignmentExtras.putParcelableArrayList("classes", APIClient.getInstance(activity, null).classes);
+                // pre-fill the page's day and this class
+                assignmentExtras.putLong("dueTimestamp", PlannerDates.startOfDay(day).getTime());
+                assignmentExtras.putInt("classId", apiClass.ID);
+
+                assignmentIntent.putExtras(assignmentExtras);
+                activity.startActivityForResult(assignmentIntent, MainActivity.REQUEST_ADD_OR_EDIT_HOMEWORK);
+            }
+        });
     }
 
     private void bindHomework(ItemPlannerHomeworkBinding binding, final APIHomework hw) {

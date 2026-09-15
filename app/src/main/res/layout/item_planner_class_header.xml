@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
@@ -7,8 +8,8 @@
     android:gravity="center_vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="4dp">
+    android:paddingTop="4dp"
+    android:paddingBottom="0dp">
 
     <View
         android:id="@+id/planner_class_dot"
@@ -24,5 +25,14 @@
         android:layout_marginStart="10dp"
         android:textSize="16sp"
         android:fontFamily="sans-serif-medium" />
+
+    <ImageButton
+        android:id="@+id/planner_class_add"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_add"
+        app:tint="?attr/colorOnSurfaceVariant"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Add homework" />
 
 </LinearLayout>
