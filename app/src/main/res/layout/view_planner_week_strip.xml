@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout"
+    tools:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/planner_week_prev"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Previous week"
+        android:src="@drawable/ic_chevron_left" />
+
+    <LinearLayout
+        android:id="@+id/planner_week_days"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal" />
+
+    <ImageButton
+        android:id="@+id/planner_week_next"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Next week"
+        android:src="@drawable/ic_chevron_right" />
+
+</merge>
