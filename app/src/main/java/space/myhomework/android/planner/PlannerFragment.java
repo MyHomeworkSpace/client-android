@@ -113,6 +113,29 @@ public class PlannerFragment extends Fragment {
                 jumpToDay(PlannerDates.plusDays(selectedDay, 7 * direction), false);
             }
         });
+
+        // adds to the activity's own menu (settings, log out), and goes away with our view
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.fragment_planner, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+
+                if (id == R.id.action_today) {
+                    goToToday();
+                    return true;
+                } else if (id == R.id.action_pick_date) {
+                    openDatePicker();
+                    return true;
+                }
+
+                return false;
+            }
+        }, getViewLifecycleOwner());
     }
 
     @Override
@@ -167,6 +190,44 @@ public class PlannerFragment extends Fragment {
 
     private void jumpToDay(Date day, boolean smooth) {
         binding.plannerPager.setCurrentItem(PlannerPagerAdapter.dateToPosition(day), smooth);
+    }
+
+    private void goToToday() {
+        int position = PlannerPagerAdapter.dateToPosition(new Date());
+        // only animate if it's within the week, otherwise it flies past a pile of pages
+        boolean smooth = Math.abs(position - binding.plannerPager.getCurrentItem()) <= 6;
+        binding.plannerPager.setCurrentItem(position, smooth);
+    }
+
+    private void openDatePicker() {
+        // the picker works in utc midnights, so give it the utc midnight of the selected day
+        Calendar localCalendar = Calendar.getInstance();
+        localCalendar.setTime(selectedDay);
+
+        Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utcCalendar.clear();
+        utcCalendar.set(localCalendar.get(Calendar.YEAR), localCalendar.get(Calendar.MONTH), localCalendar.get(Calendar.DAY_OF_MONTH));
+
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder
+                .datePicker()
+                .setSelection(utcCalendar.getTimeInMillis())
+                .build();
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                // same conversion as EditHomeworkActivity: the selection is a utc midnight, we want a local day
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                calendar.setTimeInMillis(selection);
+
+                Calendar localCalendar = GregorianCalendar.getInstance();
+                localCalendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+                if (binding != null) {
+                    jumpToDay(PlannerDates.startOfDay(localCalendar.getTime()), false);
+                }
+            }
+        });
+        picker.show(getChildFragmentManager(), "datePicker");
     }
 
     // called by MainActivity after editing homework, and by pull-to-refresh
