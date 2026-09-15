@@ -309,7 +309,12 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             binding.plannerHwDescription.setText(hw.Description);
         }
 
-        binding.getRoot().setBackgroundColor(sectionBackground(allDone));
+        // a done row always gets the done tint on its own, whatever the pref or the rest of the class says
+        if (hw.Complete) {
+            binding.getRoot().setBackgroundColor(ContextCompat.getColor(activity, R.color.planner_done_bg));
+        } else {
+            binding.getRoot().setBackgroundColor(sectionBackground(allDone));
+        }
 
         // a click listener rather than a checked-change listener, so setting the state here doesn't count as a toggle
         binding.plannerHwCheckbox.setChecked(hw.Complete);
