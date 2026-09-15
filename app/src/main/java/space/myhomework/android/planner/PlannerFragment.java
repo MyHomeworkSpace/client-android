@@ -40,13 +40,17 @@ import space.myhomework.android.api.APIClient;
 import space.myhomework.android.api.APIHomework;
 import space.myhomework.android.databinding.FragmentPlannerBinding;
 
-// the planner tab: owns the selected day and fetching, and hosts a PlannerDayFragment for the day
+// the planner tab: a pager with one PlannerDayFragment per day, plus the week strip above it
+// this owns the selected day and the per-week cache, and the day fragments ask it for their data
 public class PlannerFragment extends Fragment {
-    private static final String DAY_FRAGMENT_TAG = "planner_day";
+    private static final String STATE_SELECTED_DAY = "selectedDay";
+
+    private static final SimpleDateFormat titleFormat = new SimpleDateFormat("MMM d", Locale.US);
 
     private FragmentPlannerBinding binding;
 
     private Date selectedDay;
+    private PlannerPagerAdapter adapter;
 
     // both keyed by the ISO date of the week's monday
     private HashMap<String, PlannerWeek> weeks = new HashMap<>();
@@ -68,38 +72,85 @@ public class PlannerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        requireActivity().setTitle("Planner");
-
-        // the child fragment manager restores the day fragment for us if we're being recreated
-        // its arguments survive that and our fields don't, so it's the source of truth for the day
-        PlannerDayFragment restored = getDayFragment();
-        if (restored != null) {
-            selectedDay = restored.getDay();
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_SELECTED_DAY)) {
+            selectedDay = new Date(savedInstanceState.getLong(STATE_SELECTED_DAY));
         } else {
             selectedDay = PlannerDates.startOfDay(new Date());
-            getChildFragmentManager().beginTransaction()
-                    .add(R.id.planner_day_container, PlannerDayFragment.newInstance(selectedDay), DAY_FRAGMENT_TAG)
-                    .commitNow();
         }
 
-        reload();
+        // the day fragments go in our child fragment manager, so deliverWeek can find them
+        adapter = new PlannerPagerAdapter(getChildFragmentManager(), getLifecycle());
+        binding.plannerPager.setAdapter(adapter);
+        // keep the neighbours around so a swipe doesn't have to wait for a fragment to be built
+        binding.plannerPager.setOffscreenPageLimit(1);
+
+        // move to the day before listening for page changes, then do what the callback would have done
+        // otherwise we'd get a spurious callback for position 0
+        binding.plannerPager.setCurrentItem(PlannerPagerAdapter.dateToPosition(selectedDay), false);
+        binding.plannerPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                onDaySelected(PlannerPagerAdapter.positionToDate(position));
+            }
+        });
+        onDaySelected(selectedDay);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // MainActivity sets the title to "Planner" when the tab is picked, so make sure ours wins
+        updateTitle();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (selectedDay != null) {
+            outState.putLong(STATE_SELECTED_DAY, selectedDay.getTime());
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private PlannerDayFragment getDayFragment() {
-        return (PlannerDayFragment) getChildFragmentManager().findFragmentByTag(DAY_FRAGMENT_TAG);
+        adapter = null;
     }
 
     public Date getSelectedDay() {
         return selectedDay;
     }
 
+    // called for every page change, including the initial one
+    private void onDaySelected(Date day) {
+        selectedDay = day;
+
+        ensureWeekLoaded(day);
+        // so that crossing into the next or previous week doesn't show a spinner
+        ensureWeekLoaded(PlannerDates.plusDays(day, -1));
+        ensureWeekLoaded(PlannerDates.plusDays(day, 1));
+
+        updateTitle();
+    }
+
+    private void updateTitle() {
+        if (selectedDay == null || getActivity() == null) {
+            return;
+        }
+
+        Date monday = PlannerDates.mondayOf(selectedDay);
+        getActivity().setTitle("Week of " + titleFormat.format(monday));
+    }
+
+    private void jumpToDay(Date day, boolean smooth) {
+        binding.plannerPager.setCurrentItem(PlannerPagerAdapter.dateToPosition(day), smooth);
+    }
+
     // called by MainActivity after editing homework, and by pull-to-refresh
+    // refetches without moving the pager
     public void reload() {
         if (selectedDay == null) {
             return;
