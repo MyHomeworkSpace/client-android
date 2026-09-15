@@ -2,26 +2,38 @@ package space.myhomework.android.planner;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import space.myhomework.android.R;
 import space.myhomework.android.api.APIClient;
@@ -35,6 +47,12 @@ public class PlannerFragment extends Fragment {
     private FragmentPlannerBinding binding;
 
     private Date selectedDay;
+
+    // both keyed by the ISO date of the week's monday
+    private HashMap<String, PlannerWeek> weeks = new HashMap<>();
+    // the value is a counter so that a reload can make an older in-flight request's result get ignored
+    private HashMap<String, Integer> loading = new HashMap<>();
+    private int nextRequestId = 0;
 
     public PlannerFragment() {
 
@@ -83,29 +101,116 @@ public class PlannerFragment extends Fragment {
 
     // called by MainActivity after editing homework, and by pull-to-refresh
     public void reload() {
-        final PlannerDayFragment dayFragment = getDayFragment();
-        if (dayFragment == null) {
+        if (selectedDay == null) {
             return;
         }
 
-        dayFragment.setLoading(true);
+        // throw away everything, and ignore any request that's already in flight
+        // the edit could have touched any week, so evicting just the selected one isn't enough
+        weeks.clear();
+        loading.clear();
 
-        loadWeek(PlannerDates.mondayOf(selectedDay), new Response.Listener<PlannerWeek>() {
+        // every day fragment that exists (visible, offscreen, or cached by the pager) gets refetched,
+        // so nothing that's already been built can be left showing stale data
+        // fragments created later pick fresh data up through getWeekIfLoaded like usual
+        if (isAdded()) {
+            for (Fragment fragment : getChildFragmentManager().getFragments()) {
+                if (fragment instanceof PlannerDayFragment) {
+                    PlannerDayFragment dayFragment = (PlannerDayFragment) fragment;
+                    dayFragment.setLoading(true);
+                    ensureWeekLoaded(dayFragment.getDay());
+                }
+            }
+        }
+
+        // and the selected day itself, in case its fragment doesn't exist yet
+        ensureWeekLoaded(selectedDay);
+    }
+
+    // day fragments call this when their view is created; null means it's not cached (yet)
+    public PlannerWeek getWeekIfLoaded(Date day) {
+        return weeks.get(PlannerDates.formatISO(PlannerDates.mondayOf(day)));
+    }
+
+    // starts fetching the week containing the given day, unless it's already cached or being fetched
+    // once it lands, every day fragment in that week gets it through setWeek
+    public void ensureWeekLoaded(Date day) {
+        final Date monday = PlannerDates.mondayOf(day);
+        final String key = PlannerDates.formatISO(monday);
+
+        if (weeks.containsKey(key) || loading.containsKey(key)) {
+            return;
+        }
+
+        final int requestId = nextRequestId++;
+        loading.put(key, requestId);
+
+        loadWeek(monday, new Response.Listener<PlannerWeek>() {
             @Override
             public void onResponse(PlannerWeek week) {
-                dayFragment.setWeek(week);
-                dayFragment.setLoading(false);
+                // a reload might have started a newer request for this week since
+                if (!isCurrentRequest(key, requestId)) {
+                    return;
+                }
+                loading.remove(key);
+
+                weeks.put(key, week);
+                deliverWeek(monday, week);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // don't leave the spinner going forever
-                dayFragment.setLoading(false);
+                if (!isCurrentRequest(key, requestId)) {
+                    return;
+                }
+                loading.remove(key);
+
+                // don't leave the spinners going forever
+                for (PlannerDayFragment dayFragment : dayFragmentsInWeek(monday)) {
+                    dayFragment.setLoading(false);
+                }
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "Couldn't load planner", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private boolean isCurrentRequest(String key, int requestId) {
+        Integer current = loading.get(key);
+        return current != null && current == requestId;
+    }
+
+    private void deliverWeek(Date monday, PlannerWeek week) {
+        for (PlannerDayFragment dayFragment : dayFragmentsInWeek(monday)) {
+            dayFragment.setWeek(week);
+            dayFragment.setLoading(false);
+        }
+    }
+
+    // the day fragments that currently exist (visible or kept offscreen) and fall in the given week
+    private ArrayList<PlannerDayFragment> dayFragmentsInWeek(Date monday) {
+        ArrayList<PlannerDayFragment> result = new ArrayList<>();
+
+        // a response can come back after we've been torn down (e.g. the user switched tabs)
+        if (!isAdded()) {
+            return result;
+        }
+
+        String key = PlannerDates.formatISO(monday);
+
+        for (Fragment fragment : getChildFragmentManager().getFragments()) {
+            if (!(fragment instanceof PlannerDayFragment)) {
+                continue;
+            }
+
+            PlannerDayFragment dayFragment = (PlannerDayFragment) fragment;
+            if (PlannerDates.formatISO(PlannerDates.mondayOf(dayFragment.getDay())).equals(key)) {
+                result.add(dayFragment);
+            }
+        }
+
+        return result;
     }
 
     // fetches the 7 days starting at the given monday

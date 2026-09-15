@@ -23,9 +23,6 @@ public class PlannerDayFragment extends Fragment {
     private Date day;
     private PlannerDayAdapter adapter;
 
-    private Boolean queuedLoading;
-    private PlannerWeek queuedWeek;
-
     // arguments rather than a constructor, since the fragment manager might have to recreate us
     public static PlannerDayFragment newInstance(Date day) {
         PlannerDayFragment fragment = new PlannerDayFragment();
@@ -66,14 +63,16 @@ public class PlannerDayFragment extends Fragment {
             }
         });
 
-        if (queuedLoading != null) {
-            setLoading(queuedLoading);
-            queuedLoading = null;
-        }
-
-        if (queuedWeek != null) {
-            setWeek(queuedWeek);
-            queuedWeek = null;
+        // the coordinator caches whole weeks, so most of the time our data is already there
+        // if it isn't, it'll call setWeek on us once the fetch lands
+        PlannerFragment parent = (PlannerFragment) getParentFragment();
+        PlannerWeek week = parent.getWeekIfLoaded(day);
+        if (week != null) {
+            setWeek(week);
+            setLoading(false);
+        } else {
+            setLoading(true);
+            parent.ensureWeekLoaded(day);
         }
     }
 
@@ -88,9 +87,9 @@ public class PlannerDayFragment extends Fragment {
         return day;
     }
 
-    public void setLoading(boolean loading) {
+    // both of these are no-ops without a view, since onViewCreated picks the week up from the cache anyway
+    public void setLoading(final boolean loading) {
         if (binding == null) {
-            queuedLoading = loading;
             return;
         }
 
@@ -112,7 +111,6 @@ public class PlannerDayFragment extends Fragment {
 
     public void setWeek(PlannerWeek week) {
         if (binding == null) {
-            queuedWeek = week;
             return;
         }
 
