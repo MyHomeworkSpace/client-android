@@ -4,6 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <space.myhomework.android.planner.PlannerWeekStrip
+        android:id="@+id/planner_week_strip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        android:paddingTop="6dp"
+        android:paddingBottom="4dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/planner_pager"
         android:layout_width="match_parent"

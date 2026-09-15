@@ -94,6 +94,25 @@ public class PlannerFragment extends Fragment {
             }
         });
         onDaySelected(selectedDay);
+
+        // every way of navigating goes through the pager, so the strip and title only ever update from onPageSelected
+        binding.plannerWeekStrip.setListener(new PlannerWeekStrip.Listener() {
+            @Override
+            public void onDayTapped(Date day) {
+                int position = PlannerPagerAdapter.dateToPosition(day);
+                // it's at most six pages away, so animating looks fine
+                if (position != binding.plannerPager.getCurrentItem()) {
+                    binding.plannerPager.setCurrentItem(position, true);
+                }
+            }
+
+            @Override
+            public void onWeekTapped(int direction) {
+                // same weekday, one week over
+                // no animation, since scrolling through seven pages looks bad
+                jumpToDay(PlannerDates.plusDays(selectedDay, 7 * direction), false);
+            }
+        });
     }
 
     @Override
@@ -133,6 +152,7 @@ public class PlannerFragment extends Fragment {
         ensureWeekLoaded(PlannerDates.plusDays(day, -1));
         ensureWeekLoaded(PlannerDates.plusDays(day, 1));
 
+        binding.plannerWeekStrip.setSelectedDay(day);
         updateTitle();
     }
 
