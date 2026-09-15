@@ -9,10 +9,10 @@
         android:id="@+id/nav_classes"
         android:enabled="true"
         android:icon="@drawable/ic_menu_classes"
-        android:title="Classes"/>
+        android:title="Classes" />
     <item
         android:id="@+id/nav_calendar"
         android:enabled="true"
         android:icon="@drawable/ic_menu_calendar"
-        android:title="Calendar"/>
+        android:title="Calendar" />
 </menu>
