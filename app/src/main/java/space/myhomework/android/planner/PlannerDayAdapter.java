@@ -56,6 +56,8 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         APIClass apiClass;
         APIHomework homework;
         String emptyText;
+        // true for the header and homework rows of a section where everything's been done
+        boolean allDone;
     }
 
     public static class RowViewHolder extends RecyclerView.ViewHolder {
@@ -106,15 +108,61 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
                 continue;
             }
 
+            header.allDone = isAllDone(homework);
+
             for (APIHomework hw : homework) {
                 Row row = new Row();
                 row.type = TYPE_HOMEWORK;
                 row.homework = hw;
+                row.allDone = header.allDone;
                 rows.add(row);
             }
         }
 
         notifyDataSetChanged();
+    }
+
+    // same rule as the web client: at least one thing due, and all of it done
+    private static boolean isAllDone(ArrayList<APIHomework> homework) {
+        if (homework.isEmpty()) {
+            return false;
+        }
+
+        for (APIHomework hw : homework) {
+            if (!hw.Complete) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // recomputes the tint for the section containing the given row and rebinds just that section
+    // a toggle doesn't add or remove rows, so the row list itself can stay as it is
+    private void refreshSection(int position) {
+        int start = position;
+        while (start > 0 && rows.get(start).type != TYPE_HEADER) {
+            start--;
+        }
+
+        int end = start + 1;
+        while (end < rows.size() && rows.get(end).type != TYPE_HEADER) {
+            end++;
+        }
+
+        ArrayList<APIHomework> homework = new ArrayList<>();
+        for (int i = start + 1; i < end; i++) {
+            if (rows.get(i).type == TYPE_HOMEWORK) {
+                homework.add(rows.get(i).homework);
+            }
+        }
+
+        boolean allDone = isAllDone(homework);
+        for (int i = start; i < end; i++) {
+            rows.get(i).allDone = allDone;
+        }
+
+        notifyItemRangeChanged(start, end - start, PAYLOAD_TOGGLE);
     }
 
     // flips the homework's done state straight away, then tells the server
@@ -144,9 +192,24 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             public void onErrorResponse(VolleyError error) {
                 hw.Complete = !complete;
 
+                // the list might have been rebuilt (or thrown away) by the time this comes back
+                int position = positionOf(hw);
+                if (position != -1) {
+                    refreshSection(position);
+                }
+
                 Toast.makeText(activity, "Couldn't update homework", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private int positionOf(APIHomework hw) {
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows.get(i).homework == hw) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -182,15 +245,19 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         Row row = rows.get(position);
 
         if (row.type == TYPE_HEADER) {
-            bindHeader(holder.headerBinding, row.apiClass);
+            bindHeader(holder.headerBinding, row.apiClass, row.allDone);
         } else if (row.type == TYPE_HOMEWORK) {
-            bindHomework(holder.homeworkBinding, row.homework);
+            bindHomework(holder.homeworkBinding, row.homework, row.allDone);
         } else {
             holder.emptyBinding.plannerEmptyText.setText(row.emptyText);
         }
     }
 
-    private void bindHeader(ItemPlannerClassHeaderBinding binding, APIClass apiClass) {
+    private int sectionBackground(boolean allDone) {
+        return allDone ? ContextCompat.getColor(activity, R.color.planner_done_bg) : Color.TRANSPARENT;
+    }
+
+    private void bindHeader(ItemPlannerClassHeaderBinding binding, final APIClass apiClass, boolean allDone) {
         int color;
         try {
             color = Color.parseColor("#" + apiClass.Color);
@@ -202,6 +269,8 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         binding.plannerClassDot.getBackground().mutate().setTint(color);
         binding.plannerClassName.setText(apiClass.Name);
         binding.plannerClassName.setTextColor(color);
+
+        binding.getRoot().setBackgroundColor(sectionBackground(allDone));
 
         binding.plannerClassAdd.setContentDescription("Add homework for " + apiClass.Name);
         binding.plannerClassAdd.setOnClickListener(new View.OnClickListener() {
@@ -222,7 +291,7 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         });
     }
 
-    private void bindHomework(ItemPlannerHomeworkBinding binding, final APIHomework hw) {
+    private void bindHomework(final ItemPlannerHomeworkBinding binding, final APIHomework hw, boolean allDone) {
         // same prefix highlighting as the homework tab
         APIClient c = APIClient.getInstance(activity, null);
         PrefixInfo prefixInfo = c.prefixes.getPrefixInfo(hw.Name);
@@ -240,6 +309,8 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             binding.plannerHwDescription.setVisibility(View.VISIBLE);
             binding.plannerHwDescription.setText(hw.Description);
         }
+
+        binding.getRoot().setBackgroundColor(sectionBackground(allDone));
 
         // a click listener rather than a checked-change listener, so setting the state here doesn't count as a toggle
         binding.plannerHwCheckbox.setChecked(hw.Complete);
