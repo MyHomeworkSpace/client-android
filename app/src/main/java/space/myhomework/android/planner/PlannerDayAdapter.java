@@ -251,8 +251,10 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         }
     }
 
+    // same "darkenDoneBoxes" preference the web planner checks
     private int sectionBackground(boolean allDone) {
-        return allDone ? ContextCompat.getColor(activity, R.color.planner_done_bg) : Color.TRANSPARENT;
+        boolean darkenDoneBoxes = APIClient.getInstance(activity, null).getBoolPref("darkenDoneBoxes");
+        return darkenDoneBoxes && allDone ? ContextCompat.getColor(activity, R.color.planner_done_bg) : Color.TRANSPARENT;
     }
 
     private void bindHeader(ItemPlannerClassHeaderBinding binding, final APIClass apiClass, boolean allDone) {
