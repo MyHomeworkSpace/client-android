@@ -94,6 +94,19 @@ public class PlannerDayFragment extends Fragment {
             return;
         }
 
+        // swiperefreshlayout 1.0 ignores setRefreshing(true) if it hasn't been laid out yet
+        if (!binding.plannerRefreshLayout.isLaidOut()) {
+            binding.plannerRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (binding != null) {
+                        binding.plannerRefreshLayout.setRefreshing(loading);
+                    }
+                }
+            });
+            return;
+        }
+
         binding.plannerRefreshLayout.setRefreshing(loading);
     }
 
