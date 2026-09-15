@@ -56,7 +56,7 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         APIClass apiClass;
         APIHomework homework;
         String emptyText;
-        // true for the header and homework rows of a section where everything's been done
+        // true for every row of a section where everything's been done (or nothing's due)
         boolean allDone;
     }
 
@@ -100,15 +100,16 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             rows.add(header);
 
             ArrayList<APIHomework> homework = week.homeworkFor(day, apiClass.ID);
+            header.allDone = isAllDone(homework);
+
             if (homework.isEmpty()) {
                 Row empty = new Row();
                 empty.type = TYPE_EMPTY;
                 empty.emptyText = "Nothing due";
+                empty.allDone = header.allDone;
                 rows.add(empty);
                 continue;
             }
-
-            header.allDone = isAllDone(homework);
 
             for (APIHomework hw : homework) {
                 Row row = new Row();
@@ -122,12 +123,8 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         notifyDataSetChanged();
     }
 
-    // same rule as the web client: at least one thing due, and all of it done
+    // a class with nothing due counts as done too, so there's nothing left to look at
     private static boolean isAllDone(ArrayList<APIHomework> homework) {
-        if (homework.isEmpty()) {
-            return false;
-        }
-
         for (APIHomework hw : homework) {
             if (!hw.Complete) {
                 return false;
@@ -250,6 +247,7 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
             bindHomework(holder.homeworkBinding, row.homework, row.allDone);
         } else {
             holder.emptyBinding.plannerEmptyText.setText(row.emptyText);
+            holder.emptyBinding.getRoot().setBackgroundColor(sectionBackground(row.allDone));
         }
     }
 
