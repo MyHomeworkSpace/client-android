@@ -5,5 +5,5 @@
     <color name="colorAccent">#FF6D00</color>
     <color name="colorContainer">#EFEDF8</color>
     <color name="ic_launcher_background">#3A98D4</color>
-    <color name="planner_done_bg">#ECEBEF</color>
+    <color name="planner_done_bg">#CCCCCC</color>
 </resources>

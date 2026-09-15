@@ -268,7 +268,6 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
 
         binding.plannerClassDot.getBackground().mutate().setTint(color);
         binding.plannerClassName.setText(apiClass.Name);
-        binding.plannerClassName.setTextColor(color);
 
         binding.getRoot().setBackgroundColor(sectionBackground(allDone));
 
