@@ -53,6 +53,11 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
     private Date dueDate;
 
+    // what the form started out as, so we know whether there's anything to lose on back
+    // for edits these come from hw; for new items they come from the pre-fill extras, if any
+    private Date initialDue;
+    private int initialClassID = -1;
+
     /**
      * Handles back only while there are unsaved changes to confirm. Left disabled otherwise so the
      * system can run its own back animation, which it can't do once we intercept the gesture.
@@ -93,6 +98,8 @@ public class EditHomeworkActivity extends AppCompatActivity {
 
         if (!isNew) {
             hw = params.getParcelable("homework");
+            initialDue = hw.Due;
+            initialClassID = hw.ClassID;
 
             ((EditText)findViewById(R.id.homeworkName)).setText(hw.Name);
             setDate(hw.Due);
@@ -104,6 +111,21 @@ public class EditHomeworkActivity extends AppCompatActivity {
             }
             ((CheckBox)findViewById(R.id.homeworkDone)).setChecked(hw.Complete);
             ((EditText)findViewById(R.id.homeworkDesc)).setText(hw.Description);
+        } else {
+            // the planner pre-fills the day and/or class; either may be missing
+            if (params.containsKey("dueTimestamp")) {
+                initialDue = new Date(params.getLong("dueTimestamp"));
+                setDate(initialDue);
+            }
+            if (params.containsKey("classId")) {
+                initialClassID = params.getInt("classId");
+                for (int i = 0; i < classSpinner.getCount(); i++) {
+                    if (classIDs.get(i).equals(initialClassID)) {
+                        classSpinner.setSelection(i);
+                        break;
+                    }
+                }
+            }
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -260,9 +282,9 @@ public class EditHomeworkActivity extends AppCompatActivity {
         String homeworkDueString = dueDate != null ? new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(dueDate) : "";
 
         String initialHomeworkName = hw != null ? hw.Name : "";
-        String initialHomeworkDue = hw != null ? new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(hw.Due) : "";
+        String initialHomeworkDue = initialDue != null ? new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(initialDue) : "";
         String initialHomeworkDesc = hw != null ? hw.Description : "";
-        int initialHomeworkClassID = hw != null ? hw.ClassID : -1;
+        int initialHomeworkClassID = initialClassID;
         boolean initialHomeworkComplete = hw != null ? hw.Complete : false;
 
         if (!homeworkName.getText().toString().equals(initialHomeworkName)) {
