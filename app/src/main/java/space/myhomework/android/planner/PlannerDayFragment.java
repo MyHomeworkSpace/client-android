@@ -54,7 +54,11 @@ public class PlannerDayFragment extends Fragment {
         adapter = new PlannerDayAdapter(requireActivity(), new Runnable() {
             @Override
             public void run() {
-                // TODO
+                // a toggle's server response can land after we've been torn down
+                PlannerFragment parent = (PlannerFragment) getParentFragment();
+                if (parent != null) {
+                    parent.onHomeworkChanged();
+                }
             }
         });
         binding.plannerRecyclerView.setAdapter(adapter);

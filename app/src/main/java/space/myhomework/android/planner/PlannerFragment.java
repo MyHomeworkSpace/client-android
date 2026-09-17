@@ -176,7 +176,20 @@ public class PlannerFragment extends Fragment {
         ensureWeekLoaded(PlannerDates.plusDays(day, 1));
 
         binding.plannerWeekStrip.setSelectedDay(day);
+        updateStripWeek();
         updateTitle();
+    }
+
+    private void updateStripWeek() {
+        if (binding == null || selectedDay == null) {
+            return;
+        }
+
+        binding.plannerWeekStrip.setWeek(getWeekIfLoaded(selectedDay));
+    }
+
+    public void onHomeworkChanged() {
+        updateStripWeek();
     }
 
     private void updateTitle() {
@@ -288,6 +301,7 @@ public class PlannerFragment extends Fragment {
 
                 weeks.put(key, week);
                 deliverWeek(monday, week);
+                updateStripWeek();
             }
         }, new Response.ErrorListener() {
             @Override
