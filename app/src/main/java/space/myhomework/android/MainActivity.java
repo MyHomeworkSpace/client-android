@@ -43,6 +43,7 @@ import java.util.HashMap;
 import space.myhomework.android.api.APIAccount;
 import space.myhomework.android.api.APIClass;
 import space.myhomework.android.api.APIClient;
+import space.myhomework.android.planner.PlannerFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationBarView.OnItemSelectedListener {
@@ -185,6 +186,8 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (id == R.id.nav_homework) {
             activeFragment = new HomeworkFragment();
+        } else if (id == R.id.nav_planner) {
+            activeFragment = new PlannerFragment();
         } else if (id == R.id.nav_classes) {
             activeFragment = new ClassesFragment();
         } else if (id == R.id.nav_calendar) {
@@ -213,6 +216,12 @@ public class MainActivity extends AppCompatActivity
             // so instead we just ask it directly to reload
             // TODO: this is hacky and should be done in a more generic way
             ((CalendarFragment) activeFragment).loadDay();
+            return;
+        }
+
+        if (activeFragment instanceof PlannerFragment) {
+            // same deal: remaking it would reset the selected day
+            ((PlannerFragment) activeFragment).reload();
             return;
         }
 
