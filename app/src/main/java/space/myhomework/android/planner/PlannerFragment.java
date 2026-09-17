@@ -46,6 +46,7 @@ public class PlannerFragment extends Fragment {
     private static final String STATE_SELECTED_DAY = "selectedDay";
 
     private static final SimpleDateFormat titleFormat = new SimpleDateFormat("MMM d", Locale.US);
+    private static final SimpleDateFormat titleYearFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
 
     private FragmentPlannerBinding binding;
 
@@ -198,7 +199,13 @@ public class PlannerFragment extends Fragment {
         }
 
         Date monday = PlannerDates.mondayOf(selectedDay);
-        getActivity().setTitle("Week of " + titleFormat.format(monday));
+
+        Calendar mondayCalendar = Calendar.getInstance();
+        mondayCalendar.setTime(monday);
+        Calendar todayCalendar = Calendar.getInstance();
+
+        SimpleDateFormat format = mondayCalendar.get(Calendar.YEAR) == todayCalendar.get(Calendar.YEAR) ? titleFormat : titleYearFormat;
+        getActivity().setTitle("Week of " + format.format(monday));
     }
 
     private void jumpToDay(Date day, boolean smooth) {
