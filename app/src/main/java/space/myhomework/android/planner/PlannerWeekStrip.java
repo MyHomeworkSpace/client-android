@@ -110,13 +110,14 @@ public class PlannerWeekStrip extends LinearLayout {
             cellDays[i] = day;
 
             String dayString = PlannerDates.formatISO(day);
-            bindCell(cells[i], day, dayString.equals(todayString), dayString.equals(selectedString), day.before(today));
+            bindCell(cells[i], day, dayString.equals(todayString), dayString.equals(selectedString), day.before(today), false);
         }
     }
 
-    private void bindCell(ItemPlannerWeekDayBinding cell, Date day, boolean isToday, boolean isSelected, boolean isPast) {
+    private void bindCell(ItemPlannerWeekDayBinding cell, Date day, boolean isToday, boolean isSelected, boolean isPast, boolean hasOverdue) {
         cell.plannerWeekDayLabel.setText(dowFormat.format(day));
         cell.plannerWeekDayNumber.setText(numberFormat.format(day));
+        cell.plannerWeekDayDot.setVisibility(hasOverdue ? View.VISIBLE : View.INVISIBLE);
 
         int primary = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorPrimary);
         int onPrimary = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnPrimary);

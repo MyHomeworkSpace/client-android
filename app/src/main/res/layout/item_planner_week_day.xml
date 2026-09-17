@@ -30,4 +30,13 @@
         android:textSize="14sp"
         android:textColor="?attr/colorOnSurfaceVariant" />
 
+    <!-- shown for past days with homework that still isn't done -->
+    <View
+        android:id="@+id/planner_week_day_dot"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/planner_overdue_dot"
+        android:visibility="invisible" />
+
 </LinearLayout>
