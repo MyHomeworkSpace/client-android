@@ -38,6 +38,9 @@ public class PlannerWeekStrip extends LinearLayout {
     private ItemPlannerWeekDayBinding[] cells = new ItemPlannerWeekDayBinding[7];
     private Date[] cellDays = new Date[7];
 
+    private Date selectedDay;
+    private PlannerWeek week;
+
     private Listener listener;
 
     public PlannerWeekStrip(Context context) {
@@ -98,7 +101,23 @@ public class PlannerWeekStrip extends LinearLayout {
     }
 
     // renders the week containing selectedDay, with that day filled in
-    public void setSelectedDay(Date selectedDay) {
+    public void setSelectedDay(Date day) {
+        selectedDay = day;
+        render();
+    }
+
+    // the data for the week being shown, so that past days with unfinished homework can get a dot
+    // null clears the dots; a week that doesn't match the one being shown just won't match any cell
+    public void setWeek(PlannerWeek w) {
+        week = w;
+        render();
+    }
+
+    private void render() {
+        if (selectedDay == null) {
+            return;
+        }
+
         Date monday = PlannerDates.mondayOf(selectedDay);
         Date today = PlannerDates.startOfDay(new Date());
 
@@ -110,7 +129,9 @@ public class PlannerWeekStrip extends LinearLayout {
             cellDays[i] = day;
 
             String dayString = PlannerDates.formatISO(day);
-            bindCell(cells[i], day, dayString.equals(todayString), dayString.equals(selectedString), day.before(today), false);
+            boolean isPast = day.before(today);
+            boolean hasOverdue = isPast && week != null && week.hasIncomplete(day);
+            bindCell(cells[i], day, dayString.equals(todayString), dayString.equals(selectedString), isPast, hasOverdue);
         }
     }
 
