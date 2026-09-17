@@ -51,7 +51,12 @@ public class PlannerDayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        adapter = new PlannerDayAdapter(requireActivity());
+        adapter = new PlannerDayAdapter(requireActivity(), new Runnable() {
+            @Override
+            public void run() {
+                // TODO
+            }
+        });
         binding.plannerRecyclerView.setAdapter(adapter);
         binding.plannerRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

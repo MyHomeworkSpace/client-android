@@ -72,11 +72,13 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
     }
 
     private Activity activity;
+    private Runnable onHomeworkChanged;
     private Date day;
     private ArrayList<Row> rows = new ArrayList<>();
 
-    public PlannerDayAdapter(Activity a) {
+    public PlannerDayAdapter(Activity a, Runnable changed) {
         activity = a;
+        onHomeworkChanged = changed;
     }
 
     public void setWeek(PlannerWeek week, Date d) {
@@ -170,6 +172,7 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
         if (position != -1) {
             refreshSection(position);
         }
+        onHomeworkChanged.run();
 
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", Integer.toString(hw.ID));
@@ -194,6 +197,7 @@ public class PlannerDayAdapter extends RecyclerView.Adapter<PlannerDayAdapter.Ro
                 if (position != -1) {
                     refreshSection(position);
                 }
+                onHomeworkChanged.run();
 
                 Toast.makeText(activity, "Couldn't update homework", Toast.LENGTH_SHORT).show();
             }
