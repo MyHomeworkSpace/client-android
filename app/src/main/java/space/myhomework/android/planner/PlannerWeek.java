@@ -34,4 +34,22 @@ public class PlannerWeek {
 
         return result;
     }
+
+    // true if anything due on the given day hasn't been done yet
+    public boolean hasIncomplete(Date day) {
+        String dayString = PlannerDates.formatISO(day);
+
+        for (APIHomework hw : homework) {
+            // same rule as homeworkFor: a class that's gone means the homework isn't shown anywhere
+            if (hw.Class == null) {
+                continue;
+            }
+
+            if (!hw.Complete && PlannerDates.formatISO(hw.Due).equals(dayString)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
