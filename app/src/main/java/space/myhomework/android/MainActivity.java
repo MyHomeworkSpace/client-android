@@ -86,11 +86,14 @@ public class MainActivity extends AppCompatActivity
                 BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
                 int activeNav = bottomNavigationView.getSelectedItemId();
 
-                if (activeNav == R.id.nav_homework) {
+                if (activeNav == R.id.nav_homework || activeNav == R.id.nav_planner) {
                     Intent assignmentIntent = new Intent(ctx, EditHomeworkActivity.class);
                     Bundle assignmentExtras = new Bundle();
                     assignmentExtras.putBoolean("isNew", true);
                     assignmentExtras.putParcelableArrayList("classes", APIClient.getInstance(ctx, null).classes);
+                    if (activeNav == R.id.nav_planner && activeFragment instanceof PlannerFragment) {
+                        assignmentExtras.putLong("dueTimestamp", ((PlannerFragment) activeFragment).getSelectedDay().getTime());
+                    }
                     assignmentIntent.putExtras(assignmentExtras);
                     startActivityForResult(assignmentIntent, REQUEST_ADD_OR_EDIT_HOMEWORK);
                 } else if (activeNav == R.id.nav_classes) {
